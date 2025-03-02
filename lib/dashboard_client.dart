@@ -288,7 +288,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CarDetailsPage(car: cars[index], numberOfDays: numberOfDays),
+                          builder: (context) => CarDetailsPage(car: cars[index],date_debut:_pickupDateController.text,date_fin:_returnDateController.text,  numberOfDays: numberOfDays),
                         ),
                       );
                     },

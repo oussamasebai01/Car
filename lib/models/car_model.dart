@@ -1,6 +1,6 @@
-import 'package:car/utils/constant.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+import '../bookingCar.dart';
 class CarModel {
   final int id;
   final String tagNumber;
@@ -48,8 +48,12 @@ class CarModel {
 class CarDetailsPage extends StatelessWidget {
   final CarModel car;
   final int numberOfDays;
+  final String date_debut;
+  final String date_fin;
 
-  CarDetailsPage({required this.car, required this. numberOfDays});
+  CarDetailsPage({required this.car, required this. numberOfDays, required this.date_debut, required this.date_fin});
+
+  late String prix_total =  (numberOfDays*car.pricePerDay).toString();
 
   @override
   Widget build(BuildContext context) {
@@ -215,9 +219,12 @@ class CarDetailsPage extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // Action pour réserver la voiture
-                  // Navigator.popUntil(context, (route) => route.isFirst);
-                  // Navigator.pushReplacementNamed(context, '/DashboardClient');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => BookingDetailScreen(date_debut :date_debut , date_fin: date_fin,prix_total:prix_total),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16),
