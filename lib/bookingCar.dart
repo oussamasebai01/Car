@@ -1,18 +1,18 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:car/utils/config.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../utils/constant.dart';
+import 'package:intl/intl.dart';
 
 class BookingDetailScreen extends StatefulWidget {
-
   final String date_debut;
   final String date_fin;
   final String prix_total;
-  const BookingDetailScreen({Key? key, required this.date_debut, required this.date_fin , required this.prix_total}) : super(key: key);
+  const BookingDetailScreen({Key? key, required this.date_debut, required this.date_fin, required this.prix_total}) : super(key: key);
 
   @override
   State<BookingDetailScreen> createState() => _BookingDetailScreenState();
@@ -29,11 +29,12 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
   String? _paymentMethod;
   XFile? _licenseImage;
   XFile? _idImage;
-  List<String> cities = [];
+  List<Map<String, dynamic>> cities = []; // Stocker les villes avec leurs IDs
 
-  final List<String> _paymentMethods = ['Cash', 'Clique'];
+  final List<String> _paymentMethods = ['cash', 'cliq'];
   String? selectedCountry;
-  String? selectedCity;
+  int? selectedCityId; // Stocker l'ID de la ville sélectionnée
+  String? selectedCityName; // Stocker le nom de la ville sélectionnée
   final TextEditingController _idController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _fatherNameController = TextEditingController();
@@ -47,19 +48,16 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
   late Future<List<Map<String, dynamic>>> fetchedCountries;
 
   Future<List<Map<String, dynamic>>> fetchCountries() async {
-
     try {
-      final response = await http.get(
-          Uri.parse("${Config.BASE_URL}/countries") );
-
+      final response = await http.get(Uri.parse("${Config.BASE_URL}/countries"));
       print("response :$response");
       if (response.statusCode == 200) {
         List<dynamic> countriesFromServer = json.decode(response.body);
         print("Countries from server: $countriesFromServer");
         return countriesFromServer.map((country) {
           return {
-            "id": country["id"], // ✅ On récupère l'ID
-            "name": country["name_en"] // ✅ Nom du pays en arabe
+            "id": country["id"],
+            "name": country["name_en"]
           };
         }).toList();
       } else {
@@ -71,15 +69,18 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       return [];
     }
   }
-  Future<List<String>> fetchCities(int countryId) async {
-    try {
-      final response = await http.get(
-          Uri.parse("${Config.BASE_URL}/countries/$countryId/cities") );
 
+  Future<List<Map<String, dynamic>>> fetchCities(int countryId) async {
+    try {
+      final response = await http.get(Uri.parse("${Config.BASE_URL}/countries/$countryId/cities"));
       if (response.statusCode == 200) {
         List<dynamic> citiesFromServer = json.decode(response.body);
-        return citiesFromServer.map((city) => city["name_en"].toString())
-            .toList();
+        return citiesFromServer.map((city) {
+          return {
+            "id": city["id"], // ID de la ville
+            "name": city["name_en"] // Nom de la ville
+          };
+        }).toList();
       } else {
         print("Erreur serveur: ${response.statusCode}");
         return [];
@@ -105,12 +106,72 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       }
     } catch (e) {
       print("Error picking image: $e");
-      // Afficher un message d'erreur à l'utilisateur si nécessaire
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Failed to open camera: $e")),
       );
     }
   }
+
+
+  Future<void> _submitForm() async {
+    final url = Uri.parse('http://10.0.2.2:8000/api/add_client/65');
+    final request = http.MultipartRequest('POST', url);
+
+    // Ajouter les champs texte
+    request.fields['national_id'] = _idController.text;
+    request.fields['first_name'] = _firstNameController.text;
+    request.fields['middle_name'] = _fatherNameController.text;
+    request.fields['last_name'] = _lastNameController.text;
+    request.fields['email'] = _emailController.text;
+    request.fields['phone_number'] = _phoneController.text;
+    request.fields['whatsapp_number'] = _whatsappController.text;
+    request.fields['city_id'] = selectedCityId.toString();
+    request.fields['country_id'] = selectedCountry ?? '';
+    request.fields['street'] = _streetController.text;
+    request.fields['building_number'] = _buildingNumberController.text;
+    request.fields['nearest_location'] = _nearestLocationController.text;
+    request.fields['payment_method'] = _paymentMethod ?? '';
+    request.fields['total_price'] = widget.prix_total;
+    request.fields['rent_date'] = widget.date_debut;
+    request.fields['return_date'] = widget.date_fin;
+
+    // Ajouter les fichiers
+    if (_licenseImage != null) {
+      request.files.add(await http.MultipartFile.fromPath(
+        'driver_license', // Nom du champ attendu par le backend
+        _licenseImage!.path,
+      ));
+    }
+
+    if (_idImage != null) {
+      request.files.add(await http.MultipartFile.fromPath(
+        'id_picture', // Nom du champ attendu par le backend
+        _idImage!.path,
+      ));
+    }
+   print("files :$request.files.id_picture");
+   print("files :$request.files.driver_license");
+    print("fields : $request.fields");
+
+    try {
+      final response = await request.send();
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Client added successfully!')),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add client: ${await response.stream.bytesToString()}')),
+        );
+      }
+    } catch (e) {
+      print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
   @override
   void initState() {
     fetchedCountries = fetchCountries();
@@ -124,9 +185,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         color: Colors.white,
         child: ElevatedButton(
-          onPressed: () {
-            Navigator.pushNamed(context, '/PersonalInformationScreen');
-          },
+          onPressed: _submitForm, // Appeler _submitForm ici
           style: ElevatedButton.styleFrom(
             backgroundColor: primaryColor,
             minimumSize: Size(double.infinity, 50),
@@ -166,7 +225,6 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                 ],
               ),
               SizedBox(height: 20),
-              // Nouveaux champs ajoutés
               FutureBuilder<List<Map<String, dynamic>>>(
                 future: fetchCountries(),
                 builder: (context, snapshot) {
@@ -181,44 +239,45 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
                   List<Map<String, dynamic>> countries = snapshot.data!;
 
-                  return DropdownButtonFormField<int>( // ✅ Maintenant, on stocke un `int` (l'ID du pays)
+                  return DropdownButtonFormField<int>(
                     value: selectedCountry != null ? int.tryParse(selectedCountry!) : null,
                     items: countries.map((country) {
                       return DropdownMenuItem<int>(
-                        value: country["id"], // ✅ Utilisation de l'ID réel du pays
-                        child: Text(country["name"]), // ✅ Affichage du nom du pays
+                        value: country["id"],
+                        child: Text(country["name"]),
                       );
                     }).toList(),
                     onChanged: (value) async {
                       setState(() {
-                        selectedCountry = value.toString(); // ✅ Stocker l'ID du pays sélectionné sous forme de String
-                        selectedCity = null;
+                        selectedCountry = value.toString();
+                        selectedCityId = null;
+                        selectedCityName = null;
                         cities = [];
                       });
 
-                      // ✅ Charger les villes du pays sélectionné
-                      List<String> fetchedCities = await fetchCities(value!);
+                      List<Map<String, dynamic>> fetchedCities = await fetchCities(value!);
                       setState(() {
                         cities = fetchedCities;
                       });
                     },
-                    decoration: InputDecoration(labelText: "اختر البلد", border: OutlineInputBorder(),),
+                    decoration: InputDecoration(labelText: "اختر البلد", border: OutlineInputBorder()),
                   );
                 },
               ),
               SizedBox(height: 10),
               if (cities.isNotEmpty)
                 DropdownButtonFormField<String>(
-                  value: selectedCity,
-                  items: cities.map((String city) {
+                  value: selectedCityName,
+                  items: cities.map((Map<String, dynamic> city) {
                     return DropdownMenuItem<String>(
-                      value: city,
-                      child: Text(city),
+                      value: city["name"],
+                      child: Text(city["name"]),
                     );
                   }).toList(),
                   onChanged: (value) {
                     setState(() {
-                      selectedCity = value;
+                      selectedCityName = value;
+                      selectedCityId = cities.firstWhere((city) => city["name"] == value)["id"];
                     });
                   },
                   decoration: InputDecoration(labelText: "موقع الاستلام", border: OutlineInputBorder()),
