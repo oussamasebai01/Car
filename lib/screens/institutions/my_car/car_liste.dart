@@ -1,11 +1,15 @@
+
 import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:car/models/car_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../../utils/config.dart';
+import 'car_details.dart';
 
 class MyBookingScreen extends StatefulWidget {
   const MyBookingScreen({Key? key}) : super(key: key);
@@ -19,11 +23,11 @@ Future<String?> getAuthToken() async {
   return prefs.getString('auth_token');
 }
 
-Future<List<Map<String, dynamic>>> fetchCars() async {
+Future<List<CarModel>> fetchCars() async {
   final token = await getAuthToken();
   print(token);
   final response = await http.get(
-    Uri.parse('${Config.BASE_URL}/cars-inst'),
+    Uri.parse('http://10.0.2.2:8000/api/cars-inst'),
     headers: {
       'Authorization': 'Bearer $token',
     },
@@ -32,15 +36,19 @@ Future<List<Map<String, dynamic>>> fetchCars() async {
   if (response.statusCode == 200) {
     final List<dynamic> data = json.decode(response.body);
     return data.map((car) {
-      return {
-        'car': 'assets/bmw_x5.png',
-        'name': car['model']['name_en'],
-        'tagNumber': car['tagNumber'],
-        'address': '${car['city']}, ${car['country']}',
-        'tripStart': 'Sat, 7 June, 5.30pm',
-        'tripEnd': 'Mon, 9 June, 6.30pm',
-        'paid': car['price_per_day']?.toString() ?? '0',
-      };
+      return CarModel(
+        id: car['id'],
+        tagNumber: car['tagNumber'],
+        pricePerDay: car['price_per_day']?.toDouble() ?? 0.0, // Assurez-vous que le prix est bien un double
+        carColor: car['car_color'],
+        city: car['city'],
+        gazType: car['gaz_type'],
+        transmission: car['transmission'],
+        seatNumber: car['seat_number'],
+        modelName: car['model']['name_en'],
+        manufacturerName: car['model']['manufacture']['name_en'],
+        institutionName: car['institution']['name'],
+      );
     }).toList();
   } else {
     throw Exception('Failed to load data');
@@ -48,8 +56,8 @@ Future<List<Map<String, dynamic>>> fetchCars() async {
 }
 
 class _MyBookingScreenState extends State<MyBookingScreen> {
-  Future<List<Map<String, dynamic>>>? futureCars;
-  List<Map<String, dynamic>> filteredBookings = [];
+  Future<List<CarModel>>? futureCars;
+  List<CarModel> filteredBookings = [];
   TextEditingController searchController = TextEditingController();
 
   @override
@@ -62,7 +70,6 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
       return bookings;
     });
   }
-
   void filterBookings(String query) {
     setState(() {
       if (query.isEmpty) {
@@ -73,7 +80,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
         futureCars!.then((bookings) {
           filteredBookings = bookings
               .where((booking) =>
-          booking['tagNumber'].toLowerCase().contains(query.toLowerCase()))
+              booking.tagNumber.toLowerCase().contains(query.toLowerCase()))
               .toList();
         });
       }
@@ -111,7 +118,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
           ),
           // Liste des réservations
           Expanded(
-            child: FutureBuilder<List<Map<String, dynamic>>>(
+            child: FutureBuilder<List<CarModel>>(
               future: futureCars,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -158,211 +165,224 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
     );
   }
 
-  Widget filledBooking(List<Map<String, dynamic>> bookingList) {
+  Widget filledBooking(List<CarModel> bookingList) {
     return SingleChildScrollView(
       child: ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         itemCount: bookingList.length,
         itemBuilder: (context, index) {
-          return Stack(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CarDetailsPageI(car: bookingList[index]),
                 ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        SizedBox(
-                          height: 15.h,
-                          child: Image.asset(bookingList[index]['car']),
-                        ),
-                        const SizedBox(width: 20),
-                        SizedBox(
-                          height: 8.h,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              AutoSizeText(
-                                bookingList[index]['name'],
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black,
-                                ),
-                                maxLines: 1,
-                              ),
-                              AutoSizeText(
-                                'Tag Number ${bookingList[index]['tagNumber']}',
-                                style: const TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey,
-                                ),
-                                maxLines: 1,
-                              ),
-                            ],
+              );
+            },
+            child: Stack(
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+                  margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 2,
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Image.asset(
+                            "assets/bmw_x5.png", // Image par défaut
+                            fit: BoxFit.cover,
+                            width: 100,
+                            height: 70,
+                            // Hauteur de l'image
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.location_on,
-                          color: Colors.blue,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 5),
-                        SizedBox(
-                          width: 60.w,
-                          child: Text(
-                            bookingList[index]['address'],
-                            style: const TextStyle(
-                              fontSize: 9,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
-                            ),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 4,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Trip start',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey,
+                          const SizedBox(width: 20),
+                          SizedBox(
+                            height: 8.h,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                AutoSizeText(
+                                  bookingList[index].modelName,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black,
+                                  ),
+                                  maxLines: 1,
                                 ),
-                              ),
-                              Text(
-                                bookingList[index]['tripStart'],
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black,
+                                AutoSizeText(
+                                  'Tag Number ${bookingList[index].tagNumber}',
+                                  style: const TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey,
+                                  ),
+                                  maxLines: 1,
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          flex: 4,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Trip end',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              Text(
-                                bookingList[index]['tripEnd'],
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                'Paid',
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              Text(
-                                '\$${bookingList[index]['paid']}',
-                                style: const TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Positioned(
-                right: 0,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 25),
-                  child: GestureDetector(
-                    onTap: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          backgroundColor: Colors.blue,
-                          duration: const Duration(seconds: 1),
-                          content: Text(
-                            "${bookingList[index]['name']} removed",
-                            style: const TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
+                              ],
                             ),
                           ),
-                        ),
-                      );
-                      setState(() {
-                        bookingList.removeAt(index);
-                      });
-                    },
-                    child: const Icon(
-                      Icons.cancel_outlined,
-                      color: Colors.grey,
-                      size: 23,
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.location_on,
+                            color: Colors.blue,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 5),
+                          SizedBox(
+                            width: 60.w,
+                            child: Text(
+                              bookingList[index].city,
+                              style: const TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 4,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Trip start',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                Text(
+                                  bookingList[index].carColor,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            flex: 4,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Trip end',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                Text(
+                                  bookingList[index].manufacturerName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Paid',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                Text(
+                                  '\$${bookingList[index].pricePerDay}',
+                                  style: const TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 25),
+                    child: GestureDetector(
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: Colors.blue,
+                            duration: const Duration(seconds: 1),
+                            content: Text(
+                              "${bookingList[index].modelName} removed",
+                              style: const TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        );
+                        setState(() {
+                          bookingList.removeAt(index);
+                        });
+                      },
+                      child: const Icon(
+                        Icons.cancel_outlined,
+                        color: Colors.grey,
+                        size: 23,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         },
       ),
