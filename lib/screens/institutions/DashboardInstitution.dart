@@ -1,60 +1,94 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../utils/config.dart';
 
 class DashboardInstitution extends StatelessWidget {
-  // List of card data (title and icon)
+  // List of card data (title, icon, and route)
   final List<Map<String, dynamic>> cards = [
-    {'title': 'My Cars', 'icon': FontAwesomeIcons.car},
-    {'title': 'Booking List', 'icon': FontAwesomeIcons.list},
-    {'title': 'Booking Requests', 'icon': FontAwesomeIcons.solidEnvelope},
-    {'title': 'Rejected List', 'icon': FontAwesomeIcons.timesCircle},
-    {'title': 'Cancelled List', 'icon': FontAwesomeIcons.ban},
-    {'title': 'Finished Bookings', 'icon': FontAwesomeIcons.checkCircle},
+    {'title': 'My Cars', 'icon': FontAwesomeIcons.car, 'route': '/car_liste'},
+    {'title': 'Booking List', 'icon': FontAwesomeIcons.list, 'route': '/booking_list'},
+    {'title': 'Booking Requests', 'icon': FontAwesomeIcons.solidEnvelope, 'route': '/booking_requests'},
+    {'title': 'Rejected List', 'icon': FontAwesomeIcons.timesCircle, 'route': '/rejected_list'},
+    {'title': 'Cancelled List', 'icon': FontAwesomeIcons.ban, 'route': '/cancelled_list'},
+    {'title': 'Finished Bookings', 'icon': FontAwesomeIcons.checkCircle, 'route': '/finished_bookings'},
   ];
+
+  Future<String?> getAuthToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('auth_token');
+  }
+
+  Future<void> Logout() async {
+    final token = await getAuthToken();
+    print(token);
+    if (token != null) {
+      final response = await http.post(
+        Uri.parse('${Config.BASE_URL}/logout'),
+        headers: {
+          'Authorization': 'Bearer $token',
+        },
+      );
+      // Handle the response
+    } else {
+      // Handle the case where there is no token
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Institution Dashboard'),
-        actions: [IconButton(onPressed: () {
-          // Navigate to Forgot Password Screen
-          Navigator.pushNamed(context, '/dashboardinstitution');
-        },
-          icon: Icon(FontAwesomeIcons.signOutAlt), // Logout icon
-          tooltip: 'Logout',
-        )],
+        automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            onPressed: () {
+              Logout();
+              Navigator.pushReplacementNamed(context, '/singin');
+            },
+            icon: Icon(FontAwesomeIcons.signOutAlt),
+            tooltip: 'Logout',
+          ),
+        ],
         centerTitle: true,
-        backgroundColor: Colors.green, // Keep app bar green
-        elevation: 0, // Remove shadow
+        backgroundColor: Colors.green,
+        elevation: 0,
       ),
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [Colors.white, Colors.grey[100]!], // Subtle gradient
+            colors: [Colors.white, Colors.grey[100]!],
           ),
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: GridView.builder(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, // 2 cards per row
+              crossAxisCount: 2,
               crossAxisSpacing: 16.0,
               mainAxisSpacing: 16.0,
-              childAspectRatio: 1.2, // Adjust card aspect ratio
+              childAspectRatio: 1.2,
             ),
             itemCount: cards.length,
             itemBuilder: (context, index) {
-              return _buildCard(cards[index]['title'], cards[index]['icon']);
+              return _buildCard(
+                context,
+                cards[index]['title'],
+                cards[index]['icon'],
+                cards[index]['route'], // Pass the specific route
+              );
             },
           ),
         ),
       ),
       bottomNavigationBar: Container(
         height: 60,
-        color: Colors.green, // Green footer
+        color: Colors.green,
         child: Center(
           child: Text(
             '© 2025 Go Sayara ',
@@ -70,19 +104,23 @@ class DashboardInstitution extends StatelessWidget {
   }
 
   // Function to build a card
-  Widget _buildCard(String title, IconData icon) {
+  Widget _buildCard(BuildContext context, String title, IconData icon, String route) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: Card(
-        elevation: 5, // Default shadow
+        elevation: 5,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
-          side: BorderSide(color: Colors.green.withOpacity(0.3), width: 1.5), // Lighter border
+          side: BorderSide(color: Colors.green.withOpacity(0.3), width: 1.5),
         ),
         child: InkWell(
           onTap: () {
-            // Handle card click
-            print('$title clicked');
+            // Navigate to the specific route
+            Navigator.pushReplacementNamed(context, route).then((_) {
+              print('$title clicked');
+            }).catchError((error) {
+              print('Navigation error: $error');
+            });
           },
           borderRadius: BorderRadius.circular(12.0),
           child: Container(
@@ -91,20 +129,20 @@ class DashboardInstitution extends StatelessWidget {
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Colors.white, Colors.grey[50]!], // Subtle card gradient
+                colors: [Colors.white, Colors.grey[50]!],
               ),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(icon, size: 50, color: Colors.green), // Green icon
+                Icon(icon, size: 50, color: Colors.green),
                 SizedBox(height: 16),
                 Text(
                   title,
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Colors.grey[800], // Darker text for better readability
+                    color: Colors.grey[800],
                   ),
                 ),
               ],

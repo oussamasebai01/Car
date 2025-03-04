@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:car/utils/config.dart';
+import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);
 
@@ -46,9 +47,18 @@ class _SignInScreenState extends State<SignInScreen> {
 
       // Check the response status code
       if (response.statusCode == 200) {
+
+
         // Successful login
         final Map<String, dynamic> responseData = json.decode(response.body);
         print('Login successful: $responseData');
+        // Extract the token from the response
+        final String token = responseData['access_token']; // Assurez-vous que la clé est correcte
+
+        // Save the token to SharedPreferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('auth_token', token);
+        print(token);
 
         // Navigate to the home screen or perform other actions
        // Navigator.pushNamed(context, '/HomeScreen');
