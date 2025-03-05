@@ -13,6 +13,7 @@ class CarModel {
   final String modelName;
   final String manufacturerName;
   final String institutionName;
+  final int availability; // Ajoutez ce champ
 
   CarModel({
     required this.id,
@@ -26,6 +27,7 @@ class CarModel {
     required this.modelName,
     required this.manufacturerName,
     required this.institutionName,
+    required this.availability,
   });
 
   factory CarModel.fromJson(Map<String, dynamic> json) {
@@ -41,6 +43,7 @@ class CarModel {
       modelName: json['model']['name_en'],
       manufacturerName: json['model']['manufacture']['name_en'],
       institutionName: json['institution']['name'],
+      availability: json['availability'],
     );
   }
 }
@@ -222,7 +225,7 @@ class CarDetailsPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => BookingDetailScreen(date_debut :date_debut , date_fin: date_fin,prix_total:prix_total),
+                      builder: (context) => BookingDetailScreen(date_debut :date_debut , date_fin: date_fin,prix_total:prix_total,id:car.id),
                     ),
                   );
                 },

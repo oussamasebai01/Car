@@ -12,7 +12,8 @@ class BookingDetailScreen extends StatefulWidget {
   final String date_debut;
   final String date_fin;
   final String prix_total;
-  const BookingDetailScreen({Key? key, required this.date_debut, required this.date_fin, required this.prix_total}) : super(key: key);
+  final int id;
+  const BookingDetailScreen({Key? key, required this.date_debut, required this.date_fin, required this.prix_total , required this.id}) : super(key: key);
 
   @override
   State<BookingDetailScreen> createState() => _BookingDetailScreenState();
@@ -114,7 +115,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
 
   Future<void> _submitForm() async {
-    final url = Uri.parse('http://10.0.2.2:8000/api/add_client/65');
+    final url = Uri.parse('${Config.BASE_URL}/add_client/${widget.id}');
     final request = http.MultipartRequest('POST', url);
 
     // Ajouter les champs texte
