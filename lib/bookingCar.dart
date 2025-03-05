@@ -114,7 +114,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
 
   Future<void> _submitForm() async {
-    final url = Uri.parse('http://10.0.2.2:8000/api/add_client/65');
+    final url = Uri.parse('http://10.0.2.2:8000/api/add_client/9');
     final request = http.MultipartRequest('POST', url);
 
     // Ajouter les champs texte
