@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../models/car_model.dart';
+import 'add_car.dart';
 
 // ignore: must_be_immutable
 class CarDetailsPageI extends StatelessWidget {
@@ -171,6 +172,12 @@ class CarDetailsPageI extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => AddInstitutionCarScreen(isEdit:true , tempCar: car.toJson()),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16),

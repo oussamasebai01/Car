@@ -4,6 +4,9 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../utils/config.dart';
+import 'car_liste.dart';
+
 class AddInstitutionCarScreen extends StatefulWidget {
   final bool isEdit;
   final Map<String, dynamic>? tempCar;
@@ -22,6 +25,10 @@ Future<String?> getAuthToken() async {
 
 class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
   final _formKey = GlobalKey<FormState>();
+  String? selectedCountry;
+  String? selectedCity;
+  int? selectedCountryId;
+  late Future<List<Map<String, dynamic>>> fetchedCountries;
   final Map<String, dynamic> _formData = {
     'manufacturer': '',
     'model': '',
@@ -44,6 +51,45 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
     'reason': '',
   };
 
+  static const colorOptions = [
+    { 'value': 'red', 'label': 'Red', 'color': '#ff0000' },
+    { 'value': 'blue', 'label': 'Blue', 'color': '#0000ff' },
+    { 'value': 'black', 'label': 'Black', 'color': '#000000' },
+    { 'value': 'white', 'label': 'White', 'color': '#ffffff' },
+    { 'value': 'silver', 'label': 'Silver', 'color': '#c0c0c0' },
+    { 'value': 'green', 'label': 'Green', 'color': '#008000' },
+    { 'value': 'yellow', 'label': 'Yellow', 'color': '#ffff00' },
+    { 'value': 'orange', 'label': 'Orange', 'color': '#ffa500' },
+    { 'value': 'pink', 'label': 'Pink', 'color': '#ffc0cb' },
+    { 'value': 'purple', 'label': 'Purple', 'color': '#800080' },
+    { 'value': 'brown', 'label': 'Brown', 'color': '#a52a2a' },
+    { 'value': 'gray', 'label': 'Gray', 'color': '#808080' },
+    { 'value': 'beige', 'label': 'Beige', 'color': '#f5f5dc' },
+    { 'value': 'gold', 'label': 'Gold', 'color': '#ffd700' },
+    { 'value': 'bronze', 'label': 'Bronze', 'color': '#cd7f32' },
+    { 'value': 'turquoise', 'label': 'Turquoise', 'color': '#40e0d0' },
+    { 'value': 'champagne', 'label': 'Champagne', 'color': '#f7e7ce' },
+    { 'value': 'navy', 'label': 'Navy', 'color': '#000080' },
+    { 'value': 'teal', 'label': 'Teal', 'color': '#008080' },
+    { 'value': 'burgundy', 'label': 'Burgundy', 'color': '#800020' },
+    { 'value': 'lavender', 'label': 'Lavender', 'color': '#e6e6fa' },
+    { 'value': 'ivory', 'label': 'Ivory', 'color': '#fffff0' },
+    { 'value': 'pearl', 'label': 'Pearl', 'color': '#f0e5de' },
+    { 'value': 'mint', 'label': 'Mint', 'color': '#98ff98' },
+    { 'value': 'copper', 'label': 'Copper', 'color': '#b87333' },
+    { 'value': 'mahogany', 'label': 'Mahogany', 'color': '#c04000' },
+    { 'value': 'platinum', 'label': 'Platinum', 'color': '#e5e4e2' },
+    { 'value': 'matteBlack', 'label': 'Matte Black', 'color': '#212121' },
+    { 'value': 'matteWhite', 'label': 'Matte White', 'color': '#f2f2f2' },
+    { 'value': 'matteGray', 'label': 'Matte Gray', 'color': '#bdbdbd' },
+    { 'value': 'carbon', 'label': 'Carbon', 'color': '#3a3a3a' },
+  ];
+
+  // Extraire les labels de colorOptions et les convertir en majuscules
+  final colors = colorOptions.map((option) {
+    final label = option['label'] ?? ''; // Valeur par défaut si null
+    return label.toUpperCase();
+  }).toList();
   List<dynamic> manufactures = [];
   List<dynamic> models = [];
   List<String> countries = ['Tunisia', 'Jordan'];
@@ -52,10 +98,11 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
 
   @override
   void initState() {
+    fetchedCountries = fetchCountries();
     super.initState();
     fetchManufactures();
     if (widget.isEdit && widget.tempCar != null) {
-      setFields(widget.tempCar!);
+     setFields(widget.tempCar!);
     }
   }
 
@@ -98,29 +145,71 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
       print('Error fetching models: $e');
     }
   }
+  Future<List<Map<String, dynamic>>> fetchCountries() async {
+    try {
+      final response = await http.get(
+          Uri.parse('${Config.BASE_URL}/countries'));
+
+      if (response.statusCode == 200) {
+        List<dynamic> countriesFromServer = json.decode(response.body);
+
+        return countriesFromServer.map((country) {
+          return {
+            "id": country["id"], // ✅ On récupère l'ID
+            "name": country["name_en"] // ✅ Nom du pays en arabe
+          };
+        }).toList();
+      } else {
+        print("Erreur serveur: ${response.statusCode}");
+        return [];
+      }
+    } catch (e) {
+      print("Erreur lors de la récupération des pays: $e");
+      return [];
+    }
+  }
+
+  Future<List<String>> fetchCities(int countryId) async {
+    try {
+      final response = await http.get(
+          Uri.parse("${Config.BASE_URL}/countries/$countryId/cities"));
+
+      if (response.statusCode == 200) {
+        List<dynamic> citiesFromServer = json.decode(response.body);
+        return citiesFromServer.map((city) => city["name_en"].toString())
+            .toList();
+      } else {
+        print("Erreur serveur: ${response.statusCode}");
+        return [];
+      }
+    } catch (e) {
+      print("Erreur lors de la récupération des villes: $e");
+      return [];
+    }
+  }
 
   void setFields(Map<String, dynamic> car) {
-    final splitArray = car['tagNumber'].split('-');
+    final splitArray = car['tagNumber']?.split('-') ?? ['', '']; // Vérification de nullité
     setState(() {
-      _formData['manufacturer'] = car['model']['manufacture']['id'];
-      _formData['model'] = car['model']['id'];
+      // _formData['manufacturer'] = car['model']?['manufacture']?? '';
+      // _formData['model'] = car['model']?['id'] ?? '';
       _formData['tagNumber1'] = splitArray[0];
       _formData['tagNumber2'] = splitArray[1];
-      _formData['manuYear'] = car['manu_year'];
-      _formData['pricePerDay'] = car['price_per_day'];
-      _formData['pricePerWeek'] = car['price_per_week'];
-      _formData['pricePerMonth'] = car['price_per_month'];
-      _formData['pricePerYear'] = car['price_per_year'];
-      _formData['gasType'] = car['gaz_type'];
-      _formData['freeCancellation'] = car['free_cancellation'];
-      _formData['babySeat'] = car['baby_seat'];
-      _formData['transmission'] = car['transmission'];
-      _formData['seatNumber'] = car['seat_number'];
-      _formData['country'] = car['country'];
-      _formData['city'] = car['city'];
-      _formData['color'] = car['color'];
-      _formData['availability'] = car['availability'];
-      _formData['reason'] = car['reason'];
+      _formData['manuYear'] = car['manu_year'] ?? '';
+      _formData['pricePerDay'] = car['price_per_day']?.toString() ?? '';
+      _formData['pricePerWeek'] = car['price_per_week']?.toString() ?? '';
+      _formData['pricePerMonth'] = car['price_per_month']?.toString() ?? '';
+      _formData['pricePerYear'] = car['price_per_year']?.toString() ?? '';
+      _formData['gasType'] = car['gaz_type'] ?? '';
+      _formData['freeCancellation'] = car['free_cancellation'] ?? false;
+      _formData['babySeat'] = car['baby_seat'] ?? false;
+      _formData['transmission'] = car['transmission'] ?? '';
+      _formData['seatNumber'] = car['seat_number']?.toString() ?? '';
+      _formData['country'] = car['country'] ?? '';
+      _formData['city'] = car['city'] ?? 'Ariana';
+      _formData['color'] = car['car_color'] ?? '';
+      _formData['availability'] = car['availability'] ?? 1;
+      _formData['reason'] = car['reason'] ?? '';
     });
   }
 
@@ -149,14 +238,16 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
         'transmission': _formData['transmission'],
         'seat_number': int.parse(_formData['seatNumber']),
         'car_color': _formData['color'],
-        'country': _formData['country'],
-        'city': "Ariana",
+        'country': selectedCountry,
+        'city': selectedCity,
         'availability': _formData['availability'],
         'description_availability': _formData['availability'] == 0 ? _formData['reason'] : '',
       };
 
+     // print('iddddddd :${widget.tempCar!['id']}');
+
       final response = widget.isEdit
-          ? await http.put(
+          ? await http.post(
         Uri.parse('http://10.0.2.2:8000/api/update-institution-cars/${widget.tempCar!['id']}'),
         body: json.encode(payload),
         headers: {
@@ -173,16 +264,23 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
         },
       );
 
+      print(payload);
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(widget.isEdit ? 'Car updated successfully!' : 'Car added successfully!')),
         );
-        Navigator.pop(context, true); // Return to previous screen with refresh
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => MyBookingScreen(),
+          ),
+        );
       } else {
         final errorResponse = json.decode(response.body);
         throw Exception(errorResponse['error'] ?? 'Failed to submit form');
       }
     } catch (e) {
+      print(e);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
@@ -471,32 +569,67 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               ),
               const SizedBox(height: 16),
 
-              // Country Dropdown
-              DropdownButtonFormField(
-                value: _formData['country'].isEmpty ? null : _formData['country'],
-                items: [
-                  DropdownMenuItem(
-                    value: null,
-                    child: Text('Select Country'),
-                  ),
-                  ...countries.map((country) {
-                    return DropdownMenuItem(
-                      value: country,
-                      child: Text(country),
+           Column(
+            children: [
+              FutureBuilder<List<Map<String, dynamic>>>(
+                future: fetchCountries(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text("Erreur de chargement des pays");
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Text("Aucun pays disponible");
+                  }
+
+                  List<Map<String, dynamic>> countries = snapshot.data!;
+
+                  return DropdownButtonFormField<int>(
+                    value: selectedCountryId, // ✅ Utilise l'ID du pays comme valeur sélectionnée
+                    items: countries.map((country) {
+                      return DropdownMenuItem<int>(
+                        value: country["id"], // ✅ Utilisation de l'ID du pays
+                        child: Text(country["name"]), // ✅ Affichage du nom du pays
+                      );
+                    }).toList(),
+                    onChanged: (value) async {
+                      setState(() {
+                        selectedCountryId = value; // ✅ Stocke l'ID du pays sélectionné
+                        selectedCountry = countries.firstWhere((country) => country["id"] == value)["name"]; // ✅ Stocke le nom du pays
+                        selectedCity = null;
+                        cities = [];
+                      });
+
+                      // ✅ Charger les villes du pays sélectionné
+                      List<String> fetchedCities = await fetchCities(value!);
+                      setState(() {
+                        cities = fetchedCities;
+                      });
+                    },
+                    decoration: InputDecoration(labelText: "اختر البلد"),
+                  );
+                },
+              ),
+
+              if (cities.isNotEmpty)
+                DropdownButtonFormField<String>(
+                  value: selectedCity,
+                  items: cities.map((String city) {
+                    return DropdownMenuItem<String>(
+                      value: city,
+                      child: Text(city),
                     );
                   }).toList(),
-                ],
-                onChanged: (value) {
-                  setState(() {
-                    _formData['country'] = value ?? '';
-                    _formData['city'] = '';
-                  });
-                },
-                decoration: const InputDecoration(
-                  labelText: 'Country',
-                  border: OutlineInputBorder(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedCity = value;
+                    });
+                  },
+                  decoration: InputDecoration(labelText: "موقع الاستلام"),
                 ),
-              ),
+
+              ]
+          ),
               const SizedBox(height: 16),
 
               // City Dropdown
@@ -526,19 +659,68 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               // ),
               const SizedBox(height: 16),
 
-              // Color
-              TextFormField(
-                initialValue: _formData['color'],
+              DropdownButtonFormField<String>(
+                value: _formData['color']?.isEmpty ?? true ? null : _formData['color'], // Vérification null-safe
+                items: colors.map((String color) {
+                  // Trouver l'objet color correspondant dans colorOptions
+                  final colorOption = colorOptions.firstWhere(
+                        (option) => option['label']?.toUpperCase() == color,
+                    orElse: () => { 'label': 'UNKNOWN', 'color': '#000000' }, // Ajout de 'label'
+                  );
+
+                  // Vérifier que colorOption['color'] n'est pas null
+                  final colorHex = (colorOption['color'] ?? '#000000') as String;
+                  final colorValue = colorHex.replaceAll('#', '0xFF');
+
+                  return DropdownMenuItem<String>(
+                    value: color,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 20,
+                          height: 20,
+                          margin: const EdgeInsets.only(right: 10),
+                          decoration: BoxDecoration(
+                            color: Color(int.parse(colorValue)),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                        Text(color),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    _formData['color'] = value ?? ''; // Assurez-vous que la valeur n'est pas null
+                  });
+                },
                 decoration: const InputDecoration(
                   labelText: 'Color',
                   border: OutlineInputBorder(),
                 ),
-                onChanged: (value) {
-                  setState(() {
-                    _formData['color'] = value;
-                  });
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select a color';
+                  }
+                  return null;
                 },
               ),
+              //Color
+              // TextFormField(
+              //   initialValue: _formData['color'],
+              //   decoration: const InputDecoration(
+              //     labelText: 'Color',
+              //     border: OutlineInputBorder(),
+              //   ),
+              //   onChanged: (value) {
+              //     setState(() {
+              //       _formData['color'] = value;
+              //     });
+              //   },
+              // ),
+
+
               const SizedBox(height: 16),
 
               // Availability

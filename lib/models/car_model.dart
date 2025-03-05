@@ -5,6 +5,10 @@ class CarModel {
   final int id;
   final String tagNumber;
   final double pricePerDay;
+  final double pricePerWeek;
+  final double pricePerMonth;
+  final double pricePerYear;
+  final int manu_year;
   final String carColor;
   final String city;
   final String gazType;
@@ -28,6 +32,10 @@ class CarModel {
     required this.manufacturerName,
     required this.institutionName,
     required this.availability,
+    required this.manu_year,
+    required this.pricePerMonth,
+    required this.pricePerWeek,
+    required this.pricePerYear,
   });
 
   factory CarModel.fromJson(Map<String, dynamic> json) {
@@ -44,7 +52,38 @@ class CarModel {
       manufacturerName: json['model']['manufacture']['name_en'],
       institutionName: json['institution']['name'],
       availability: json['availability'],
+      manu_year: json['manu_year'],
+        pricePerMonth: json['price_per_month'],
+        pricePerWeek:json['price_per_week'],
+        pricePerYear:json['price_per_year']
     );
+  }
+  // Méthode pour convertir l'objet en Map<String, dynamic>
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'price_per_year':pricePerYear,
+      'price_per_week':pricePerWeek,
+      'price_per_month':pricePerMonth,
+      'manu_year':manu_year.toString(),
+      'tagNumber': tagNumber,
+      'price_per_day': pricePerDay,
+      'car_color': carColor,
+      'city': city,
+      'gaz_type': gazType,
+      'transmission': transmission,
+      'seat_number': seatNumber,
+      'model': {
+        'name_en': modelName,
+        'manufacture': {
+          'name_en': manufacturerName,
+        },
+      },
+      'institution': {
+        'name': institutionName,
+      },
+      'availability': availability,
+    };
   }
 }
 

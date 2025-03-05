@@ -46,6 +46,10 @@ Future<List<CarModel>> fetchCars() async {
         manufacturerName: car['model']['manufacture']['name_en'],
         institutionName: car['institution']['name'],
         availability: car['availability'],
+        manu_year: int.tryParse(car['manu_year']?.toString() ?? '0000') ?? 0000,
+        pricePerMonth: car['price_per_month']?.toDouble() ?? 0.0,
+        pricePerWeek: car['price_per_week']?.toDouble() ?? 0.0,
+        pricePerYear: car['price_per_year']?.toDouble() ?? 0.0,
       );
     }).toList();
   } else {
