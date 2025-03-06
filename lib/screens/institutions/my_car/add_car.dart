@@ -28,6 +28,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
   String? selectedCountry;
   String? selectedCity;
   int? selectedCountryId;
+
   late Future<List<Map<String, dynamic>>> fetchedCountries;
   final Map<String, dynamic> _formData = {
     'manufacturer': '',
@@ -88,8 +89,10 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
   // Extraire les labels de colorOptions et les convertir en majuscules
   final colors = colorOptions.map((option) {
     final label = option['label'] ?? ''; // Valeur par défaut si null
-    return label.toUpperCase();
+    return label.toUpperCase(); // Convertir en majuscules
   }).toList();
+  // Normaliser la valeur sélectionnée
+
   List<dynamic> manufactures = [];
   List<dynamic> models = [];
   List<String> countries = ['Tunisia', 'Jordan'];
@@ -99,6 +102,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
   @override
   void initState() {
     fetchedCountries = fetchCountries();
+
     super.initState();
     fetchManufactures();
     if (widget.isEdit && widget.tempCar != null) {
@@ -194,6 +198,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
       // _formData['manufacturer'] = car['model']?['manufacture']?? '';
       // _formData['model'] = car['model']?['id'] ?? '';
       _formData['tagNumber1'] = splitArray[0];
+
       _formData['tagNumber2'] = splitArray[1];
       _formData['manuYear'] = car['manu_year'] ?? '';
       _formData['pricePerDay'] = car['price_per_day']?.toString() ?? '';
@@ -212,7 +217,6 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
       _formData['reason'] = car['reason'] ?? '';
     });
   }
-
   Future<void> _submitForm() async {
     final token = await getAuthToken();
     if (!_formKey.currentState!.validate()) {
@@ -293,10 +297,15 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final selectedColor = _formData['color']?.toUpperCase(); // <-- Correctement placé ici
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isEdit ? 'Edit Car' : 'Add Car'),
+        title: Text(widget.isEdit ? 'Edit Car' : 'Add Car', style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+        backgroundColor: Colors.green,
+        elevation: 0,
       ),
+
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -365,9 +374,12 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   Expanded(
                     child: TextFormField(
                       initialValue: _formData['tagNumber1'],
-                      decoration: const InputDecoration(
-                        labelText: 'Tag Number Part 1',
-                        border: OutlineInputBorder(),
+                      decoration: InputDecoration(
+                        labelText: "Tag Number Part 1",
+                        prefixIcon: const Icon(Icons.tag, color: Colors.grey),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -380,10 +392,13 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   Expanded(
                     child: TextFormField(
                       initialValue: _formData['tagNumber2'],
-                      decoration: const InputDecoration(
-                        labelText: 'Tag Number Part 2',
-                        border: OutlineInputBorder(),
-                      ),
+                        decoration: InputDecoration(
+                          labelText: "Tag Number Part 2",
+                          prefixIcon: const Icon(Icons.tag, color: Colors.grey),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
                       onChanged: (value) {
                         setState(() {
                           _formData['tagNumber2'] = value;
@@ -398,9 +413,13 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               // Manufacture Year
               TextFormField(
                 initialValue: _formData['manuYear'],
-                decoration: const InputDecoration(
-                  labelText: 'Manufacture Year',
-                  border: OutlineInputBorder(),
+                keyboardType: TextInputType.numberWithOptions(signed: false),
+                decoration: InputDecoration(
+                  labelText: "Manufacture year",
+                  prefixIcon: const Icon(Icons.calendar_month, color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -413,9 +432,13 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               // Price Per Day
               TextFormField(
                 initialValue: _formData['pricePerDay'],
-                decoration: const InputDecoration(
-                  labelText: 'Price Per Day',
-                  border: OutlineInputBorder(),
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: "Price Per Day",
+                  prefixIcon: const Icon(Icons.monetization_on_rounded, color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -428,9 +451,13 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               // Price Per Week
               TextFormField(
                 initialValue: _formData['pricePerWeek'],
-                decoration: const InputDecoration(
-                  labelText: 'Price Per Week',
-                  border: OutlineInputBorder(),
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: "Price Per Week",
+                  prefixIcon: const Icon(Icons.monetization_on_rounded, color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -443,9 +470,13 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               // Price Per Month
               TextFormField(
                 initialValue: _formData['pricePerMonth'],
-                decoration: const InputDecoration(
-                  labelText: 'Price Per Month',
-                  border: OutlineInputBorder(),
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: "Price Per Week",
+                  prefixIcon: const Icon(Icons.monetization_on_rounded, color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -632,39 +663,15 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
           ),
               const SizedBox(height: 16),
 
-              // City Dropdown
-              // DropdownButtonFormField(
-              //   value: _formData['city'],
-              //   items: [
-              //     DropdownMenuItem(
-              //       value: null,
-              //       child: Text('Select City'),
-              //     ),
-              //     ...cities.map((city) {
-              //       return DropdownMenuItem(
-              //         value: city,
-              //         child: Text(city),
-              //       );
-              //     }).toList(),
-              //   ],
-              //   onChanged: (value) {
-              //     setState(() {
-              //       _formData['city'] = value ?? '';
-              //     });
-              //   },
-              //   decoration: const InputDecoration(
-              //     labelText: 'City',
-              //     border: OutlineInputBorder(),
-              //   ),
-              // ),
+
               const SizedBox(height: 16),
 
               DropdownButtonFormField<String>(
-                value: _formData['color']?.isEmpty ?? true ? null : _formData['color'], // Vérification null-safe
+                value: selectedColor, // Utiliser la valeur normalisée
                 items: colors.map((String color) {
                   // Trouver l'objet color correspondant dans colorOptions
                   final colorOption = colorOptions.firstWhere(
-                        (option) => option['label']?.toUpperCase() == color,
+                        (option) => (option['label'] ?? '').toUpperCase() == color.toUpperCase(), // Comparaison insensible à la casse
                     orElse: () => { 'label': 'UNKNOWN', 'color': '#000000' }, // Ajout de 'label'
                   );
 
@@ -673,7 +680,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   final colorValue = colorHex.replaceAll('#', '0xFF');
 
                   return DropdownMenuItem<String>(
-                    value: color,
+                    value: color, // Utiliser la valeur en majuscules
                     child: Row(
                       children: [
                         Container(

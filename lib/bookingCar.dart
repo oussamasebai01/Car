@@ -8,6 +8,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../utils/constant.dart';
 import 'package:intl/intl.dart';
 
+import 'dashboard_client.dart';
+
 class BookingDetailScreen extends StatefulWidget {
   final String date_debut;
   final String date_fin;
@@ -186,7 +188,15 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         color: Colors.white,
         child: ElevatedButton(
-          onPressed: _submitForm, // Appeler _submitForm ici
+          onPressed:() {
+            _submitForm ; // Appeler _submitForm ici
+        Navigator.push(
+        context,
+        MaterialPageRoute(
+        builder: (context) => CarSearchPage(),
+        ),
+        );
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: primaryColor,
             minimumSize: Size(double.infinity, 50),

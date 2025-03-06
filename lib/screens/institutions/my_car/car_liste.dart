@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
+import '../DashboardInstitution.dart';
 import 'add_car.dart';
 import 'car_details.dart';
 
@@ -165,6 +166,18 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
         backgroundColor: Colors.green,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back), // Icône de retour
+          onPressed: () {
+            // Navigation vers l'écran précédent
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DashboardInstitution(),
+              ),
+            );
+          },
+        ),
       ),
       body: Column(
         children: [

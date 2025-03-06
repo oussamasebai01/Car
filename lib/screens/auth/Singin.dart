@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:car/utils/config.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // Import SharedPreferences
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../dashboard_client.dart'; // Import SharedPreferences
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);
 
@@ -110,6 +112,19 @@ class _SignInScreenState extends State<SignInScreen> {
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back), // Icône de retour
+          onPressed: () {
+            // Navigation vers l'écran précédent
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => CarSearchPage(),
+              ),
+            );
+          },
         ),
       ),
       body: SingleChildScrollView(
