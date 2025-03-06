@@ -3,6 +3,7 @@ import 'package:car/screens/Auth/forgetpassword.dart';
 import 'package:car/screens/Auth/otpverify.dart';
 import 'package:car/screens/auth/Signup_screen.dart';
 import 'package:car/screens/institutions/DashboardInstitution.dart';
+import 'package:car/screens/institutions/bookingRequest.dart';
 import 'package:car/screens/institutions/my_car/car_liste.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
@@ -57,6 +58,10 @@ class MyApp extends StatelessWidget {
             "/car_liste": (context) {
               // Replace with your actual Dashboard Institution screen widget
               return MyBookingScreen ();
+            },
+            "/bookingrequest": (context) {
+              // Replace with your actual Booking Request screen widget
+              return BookingRequestScreen ();
             },
           },
         );

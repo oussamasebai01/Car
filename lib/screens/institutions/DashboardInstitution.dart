@@ -10,7 +10,7 @@ class DashboardInstitution extends StatelessWidget {
   final List<Map<String, dynamic>> cards = [
     {'title': 'My Cars', 'icon': FontAwesomeIcons.car, 'route': '/car_liste'},
     {'title': 'Booking List', 'icon': FontAwesomeIcons.list, 'route': '/booking_list'},
-    {'title': 'Booking Requests', 'icon': FontAwesomeIcons.solidEnvelope, 'route': '/booking_requests'},
+    {'title': 'Booking Requests', 'icon': FontAwesomeIcons.solidEnvelope, 'route': '/bookingrequest'},
     {'title': 'Rejected List', 'icon': FontAwesomeIcons.timesCircle, 'route': '/rejected_list'},
     {'title': 'Cancelled List', 'icon': FontAwesomeIcons.ban, 'route': '/cancelled_list'},
     {'title': 'Finished Bookings', 'icon': FontAwesomeIcons.checkCircle, 'route': '/finished_bookings'},
