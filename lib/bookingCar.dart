@@ -8,11 +8,14 @@ import 'package:image_picker/image_picker.dart';
 import '../../utils/constant.dart';
 import 'package:intl/intl.dart';
 
+import 'dashboard_client.dart';
+
 class BookingDetailScreen extends StatefulWidget {
   final String date_debut;
   final String date_fin;
   final String prix_total;
-  const BookingDetailScreen({Key? key, required this.date_debut, required this.date_fin, required this.prix_total}) : super(key: key);
+  final int id;
+  const BookingDetailScreen({Key? key, required this.date_debut, required this.date_fin, required this.prix_total , required this.id}) : super(key: key);
 
   @override
   State<BookingDetailScreen> createState() => _BookingDetailScreenState();
@@ -114,7 +117,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
 
   Future<void> _submitForm() async {
-    final url = Uri.parse('http://10.0.2.2:8000/api/add_client/9');
+    final url = Uri.parse('${Config.BASE_URL}/add_client/${widget.id}');
     final request = http.MultipartRequest('POST', url);
 
     // Ajouter les champs texte
@@ -185,7 +188,15 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         color: Colors.white,
         child: ElevatedButton(
-          onPressed: _submitForm, // Appeler _submitForm ici
+          onPressed:() {
+            _submitForm ; // Appeler _submitForm ici
+        Navigator.push(
+        context,
+        MaterialPageRoute(
+        builder: (context) => CarSearchPage(),
+        ),
+        );
+          },
           style: ElevatedButton.styleFrom(
             backgroundColor: primaryColor,
             minimumSize: Size(double.infinity, 50),

@@ -1,14 +1,12 @@
-
 import 'dart:convert';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:car/models/car_model.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
-
-import '../../../utils/config.dart';
+import '../DashboardInstitution.dart';
+import 'add_car.dart';
 import 'car_details.dart';
 
 class MyBookingScreen extends StatefulWidget {
@@ -39,7 +37,7 @@ Future<List<CarModel>> fetchCars() async {
       return CarModel(
         id: car['id'],
         tagNumber: car['tagNumber'],
-        pricePerDay: car['price_per_day']?.toDouble() ?? 0.0, // Assurez-vous que le prix est bien un double
+        pricePerDay: car['price_per_day']?.toDouble() ?? 0.0,
         carColor: car['car_color'],
         city: car['city'],
         gazType: car['gaz_type'],
@@ -48,6 +46,11 @@ Future<List<CarModel>> fetchCars() async {
         modelName: car['model']['name_en'],
         manufacturerName: car['model']['manufacture']['name_en'],
         institutionName: car['institution']['name'],
+        availability: car['availability'],
+        manu_year: int.tryParse(car['manu_year']?.toString() ?? '0000') ?? 0000,
+        pricePerMonth: car['price_per_month']?.toDouble() ?? 0.0,
+        pricePerWeek: car['price_per_week']?.toDouble() ?? 0.0,
+        pricePerYear: car['price_per_year']?.toDouble() ?? 0.0,
       );
     }).toList();
   } else {
@@ -70,6 +73,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
       return bookings;
     });
   }
+
   void filterBookings(String query) {
     setState(() {
       if (query.isEmpty) {
@@ -87,16 +91,92 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
     });
   }
 
+  // Fonction pour supprimer une réservation via l'API
+  Future<void> deleteBooking(int index) async {
+    final car = filteredBookings[index];
+    final token = await getAuthToken();
+
+    // Boîte de dialogue de confirmation
+    final confirmed = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Delete'),
+        content: Text('Are you sure you want to delete ${car.modelName}?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        // Envoyer une requête DELETE à l'API
+        final response = await http.delete(
+          Uri.parse('http://10.0.2.2:8000/api/delete-institution-cars/${car.id}'),
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        );
+
+        if (response.statusCode == 200) {
+          // Supprimer l'élément de la liste locale
+          setState(() {
+            filteredBookings.removeAt(index);
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${car.modelName} deleted successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+        } else {
+          // Gérer les erreurs de l'API
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to delete ${car.modelName}: ${response.body}'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      } catch (e) {
+        // Gérer les erreurs de connexion
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(56),
-        child: AppBar(
-          title: const Text('My Booking'),
-          centerTitle: true,
-          backgroundColor: Colors.green,
-          elevation: 0,
+      appBar: AppBar(
+        title: const Text('My Booking', style: TextStyle(color: Colors.white)),
+        centerTitle: true,
+        backgroundColor: Colors.green,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back), // Icône de retour
+          onPressed: () {
+            // Navigation vers l'écran précédent
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => DashboardInstitution(),
+              ),
+            );
+          },
         ),
       ),
       body: Column(
@@ -108,10 +188,14 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
               controller: searchController,
               decoration: InputDecoration(
                 hintText: 'Search cars...',
-                prefixIcon: const Icon(Icons.search),
+                prefixIcon: const Icon(Icons.search, color: Colors.blueGrey),
+                filled: true,
+                fillColor: Colors.grey[200],
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(15),
+                  borderSide: BorderSide.none,
                 ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 12),
               ),
               onChanged: filterBookings,
             ),
@@ -138,7 +222,12 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
       // Bouton flottant
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Action à effectuer lors du clic sur le bouton flottant
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddInstitutionCarScreen(isEdit:false , tempCar :null),
+            ),
+          );
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Floating Action Button clicked!'),
@@ -166,226 +255,165 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
   }
 
   Widget filledBooking(List<CarModel> bookingList) {
-    return SingleChildScrollView(
-      child: ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: bookingList.length,
-        itemBuilder: (context, index) {
-          return GestureDetector(
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      itemCount: bookingList.length,
+      itemBuilder: (context, index) {
+        final car = bookingList[index];
+        final borderColor = car.availability == 1 ? Colors.green : Colors.red;
+        return Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+            side: BorderSide(color: borderColor, width: 2),
+          ),
+          child: InkWell(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => CarDetailsPageI(car: bookingList[index]),
+                  builder: (context) => CarDetailsPageI(car: car),
                 ),
               );
             },
-            child: Stack(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-                  margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        spreadRadius: 2,
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Column(
+            borderRadius: BorderRadius.circular(15),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Row(
-                        children: [
-                          Image.asset(
-                            "assets/bmw_x5.png", // Image par défaut
-                            fit: BoxFit.cover,
-                            width: 100,
-                            height: 70,
-                            // Hauteur de l'image
-                          ),
-                          const SizedBox(width: 20),
-                          SizedBox(
-                            height: 8.h,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                AutoSizeText(
-                                  bookingList[index].modelName,
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black,
-                                  ),
-                                  maxLines: 1,
-                                ),
-                                AutoSizeText(
-                                  'Tag Number ${bookingList[index].tagNumber}',
-                                  style: const TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey,
-                                  ),
-                                  maxLines: 1,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: Image.asset(
+                          "assets/bmw_x5.png",
+                          fit: BoxFit.cover,
+                          width: 100,
+                          height: 70,
+                        ),
                       ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.location_on,
-                            color: Colors.blue,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 5),
-                          SizedBox(
-                            width: 60.w,
-                            child: Text(
-                              bookingList[index].city,
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              car.modelName,
                               style: const TextStyle(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
                               ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 4),
+                            Text(
+                              'Tag Number: ${car.tagNumber}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 10),
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 4,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Trip start',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                Text(
-                                  bookingList[index].carColor,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            flex: 4,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Trip end',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                Text(
-                                  bookingList[index].manufacturerName,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Paid',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                Text(
-                                  '\$${bookingList[index].pricePerDay}',
-                                  style: const TextStyle(
-                                    fontSize: 9,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => deleteBooking(index),
                       ),
                     ],
                   ),
-                ),
-                Positioned(
-                  right: 0,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 13, horizontal: 25),
-                    child: GestureDetector(
-                      onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            backgroundColor: Colors.blue,
-                            duration: const Duration(seconds: 1),
-                            content: Text(
-                              "${bookingList[index].modelName} removed",
-                              style: const TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Icon(Icons.location_on, color: Colors.blue, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        car.city,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Color',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
                               ),
                             ),
-                          ),
-                        );
-                        setState(() {
-                          bookingList.removeAt(index);
-                        });
-                      },
-                      child: const Icon(
-                        Icons.cancel_outlined,
-                        color: Colors.grey,
-                        size: 23,
+                            Text(
+                              car.carColor,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Manufacturer',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            Text(
+                              car.manufacturerName,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Price/Day',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                            Text(
+                              '\$${car.pricePerDay}',
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -394,22 +422,17 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            height: 4.5.h,
-            child: Image.asset('assets/images/no_booking.png'),
+          Image.asset(
+            'assets/images/no_booking.png',
+            height: 100,
           ),
-          const SizedBox(height: 10),
-          SizedBox(
-            width: 80.w,
-            child: const AutoSizeText(
-              'No bookings yet',
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey,
-              ),
-              maxLines: 2,
-              textAlign: TextAlign.center,
+          const SizedBox(height: 16),
+          const Text(
+            'No bookings yet',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.grey,
             ),
           ),
         ],
