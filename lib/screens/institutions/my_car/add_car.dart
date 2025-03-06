@@ -28,7 +28,6 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
   String? selectedCountry;
   String? selectedCity;
   int? selectedCountryId;
-
   late Future<List<Map<String, dynamic>>> fetchedCountries;
   final Map<String, dynamic> _formData = {
     'manufacturer': '',
@@ -53,46 +52,44 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
   };
 
   static const colorOptions = [
-    { 'value': 'red', 'label': 'Red', 'color': '#ff0000' },
-    { 'value': 'blue', 'label': 'Blue', 'color': '#0000ff' },
-    { 'value': 'black', 'label': 'Black', 'color': '#000000' },
-    { 'value': 'white', 'label': 'White', 'color': '#ffffff' },
-    { 'value': 'silver', 'label': 'Silver', 'color': '#c0c0c0' },
-    { 'value': 'green', 'label': 'Green', 'color': '#008000' },
-    { 'value': 'yellow', 'label': 'Yellow', 'color': '#ffff00' },
-    { 'value': 'orange', 'label': 'Orange', 'color': '#ffa500' },
-    { 'value': 'pink', 'label': 'Pink', 'color': '#ffc0cb' },
-    { 'value': 'purple', 'label': 'Purple', 'color': '#800080' },
-    { 'value': 'brown', 'label': 'Brown', 'color': '#a52a2a' },
-    { 'value': 'gray', 'label': 'Gray', 'color': '#808080' },
-    { 'value': 'beige', 'label': 'Beige', 'color': '#f5f5dc' },
-    { 'value': 'gold', 'label': 'Gold', 'color': '#ffd700' },
-    { 'value': 'bronze', 'label': 'Bronze', 'color': '#cd7f32' },
-    { 'value': 'turquoise', 'label': 'Turquoise', 'color': '#40e0d0' },
-    { 'value': 'champagne', 'label': 'Champagne', 'color': '#f7e7ce' },
-    { 'value': 'navy', 'label': 'Navy', 'color': '#000080' },
-    { 'value': 'teal', 'label': 'Teal', 'color': '#008080' },
-    { 'value': 'burgundy', 'label': 'Burgundy', 'color': '#800020' },
-    { 'value': 'lavender', 'label': 'Lavender', 'color': '#e6e6fa' },
-    { 'value': 'ivory', 'label': 'Ivory', 'color': '#fffff0' },
-    { 'value': 'pearl', 'label': 'Pearl', 'color': '#f0e5de' },
-    { 'value': 'mint', 'label': 'Mint', 'color': '#98ff98' },
-    { 'value': 'copper', 'label': 'Copper', 'color': '#b87333' },
-    { 'value': 'mahogany', 'label': 'Mahogany', 'color': '#c04000' },
-    { 'value': 'platinum', 'label': 'Platinum', 'color': '#e5e4e2' },
-    { 'value': 'matteBlack', 'label': 'Matte Black', 'color': '#212121' },
-    { 'value': 'matteWhite', 'label': 'Matte White', 'color': '#f2f2f2' },
-    { 'value': 'matteGray', 'label': 'Matte Gray', 'color': '#bdbdbd' },
-    { 'value': 'carbon', 'label': 'Carbon', 'color': '#3a3a3a' },
+    { 'value': 'Red', 'label': 'Red', 'color': '#ff0000' },
+    { 'value': 'Blue', 'label': 'Blue', 'color': '#0000ff' },
+    { 'value': 'Black', 'label': 'Black', 'color': '#000000' },
+    { 'value': 'White', 'label': 'White', 'color': '#ffffff' },
+    { 'value': 'Silver', 'label': 'Silver', 'color': '#c0c0c0' },
+    { 'value': 'Green', 'label': 'Green', 'color': '#008000' },
+    { 'value': 'Yellow', 'label': 'Yellow', 'color': '#ffff00' },
+    { 'value': 'Orange', 'label': 'Orange', 'color': '#ffa500' },
+    { 'value': 'Pink', 'label': 'Pink', 'color': '#ffc0cb' },
+    { 'value': 'Purple', 'label': 'Purple', 'color': '#800080' },
+    { 'value': 'Brown', 'label': 'Brown', 'color': '#a52a2a' },
+    { 'value': 'Gray', 'label': 'Gray', 'color': '#808080' },
+    { 'value': 'Beige', 'label': 'Beige', 'color': '#f5f5dc' },
+    { 'value': 'Gold', 'label': 'Gold', 'color': '#ffd700' },
+    { 'value': 'Bronze', 'label': 'Bronze', 'color': '#cd7f32' },
+    { 'value': 'Turquoise', 'label': 'Turquoise', 'color': '#40e0d0' },
+    { 'value': 'Champagne', 'label': 'Champagne', 'color': '#f7e7ce' },
+    { 'value': 'Navy', 'label': 'Navy', 'color': '#000080' },
+    { 'value': 'Teal', 'label': 'Teal', 'color': '#008080' },
+    { 'value': 'Burgundy', 'label': 'Burgundy', 'color': '#800020' },
+    { 'value': 'Lavender', 'label': 'Lavender', 'color': '#e6e6fa' },
+    { 'value': 'Ivory', 'label': 'Ivory', 'color': '#fffff0' },
+    { 'value': 'Pearl', 'label': 'Pearl', 'color': '#f0e5de' },
+    { 'value': 'Mint', 'label': 'Mint', 'color': '#98ff98' },
+    { 'value': 'Copper', 'label': 'Copper', 'color': '#b87333' },
+    { 'value': 'Mahogany', 'label': 'Mahogany', 'color': '#c04000' },
+    { 'value': 'Platinum', 'label': 'Platinum', 'color': '#e5e4e2' },
+    { 'value': 'MatteBlack', 'label': 'Matte Black', 'color': '#212121' },
+    { 'value': 'MatteWhite', 'label': 'Matte White', 'color': '#f2f2f2' },
+    { 'value': 'MatteGray', 'label': 'Matte Gray', 'color': '#bdbdbd' },
+    { 'value': 'Carbon', 'label': 'Carbon', 'color': '#3a3a3a' },
   ];
 
   // Extraire les labels de colorOptions et les convertir en majuscules
   final colors = colorOptions.map((option) {
     final label = option['label'] ?? ''; // Valeur par défaut si null
-    return label.toUpperCase(); // Convertir en majuscules
+    return label;
   }).toList();
-  // Normaliser la valeur sélectionnée
-
   List<dynamic> manufactures = [];
   List<dynamic> models = [];
   List<String> countries = ['Tunisia', 'Jordan'];
@@ -102,17 +99,16 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
   @override
   void initState() {
     fetchedCountries = fetchCountries();
-
     super.initState();
     fetchManufactures();
     if (widget.isEdit && widget.tempCar != null) {
-     setFields(widget.tempCar!);
+      setFields(widget.tempCar!);
     }
   }
 
   Future<void> fetchManufactures() async {
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8000/api/car-manufactures'));
+      final response = await http.get(Uri.parse('${Config.BASE_URL}/car-manufactures'));
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         if (responseData.containsKey('data')) {
@@ -132,7 +128,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
 
   Future<void> fetchModels(String manufacturerId) async {
     try {
-      final response = await http.get(Uri.parse('http://10.0.2.2:8000/api/car-models/$manufacturerId'));
+      final response = await http.get(Uri.parse('${Config.BASE_URL}/car-models/$manufacturerId'));
       if (response.statusCode == 200) {
         final Map<String, dynamic> responseData = json.decode(response.body);
         if (responseData.containsKey('data')) {
@@ -198,7 +194,6 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
       // _formData['manufacturer'] = car['model']?['manufacture']?? '';
       // _formData['model'] = car['model']?['id'] ?? '';
       _formData['tagNumber1'] = splitArray[0];
-
       _formData['tagNumber2'] = splitArray[1];
       _formData['manuYear'] = car['manu_year'] ?? '';
       _formData['pricePerDay'] = car['price_per_day']?.toString() ?? '';
@@ -217,6 +212,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
       _formData['reason'] = car['reason'] ?? '';
     });
   }
+
   Future<void> _submitForm() async {
     final token = await getAuthToken();
     if (!_formKey.currentState!.validate()) {
@@ -248,11 +244,11 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
         'description_availability': _formData['availability'] == 0 ? _formData['reason'] : '',
       };
 
-     // print('iddddddd :${widget.tempCar!['id']}');
+      // print('iddddddd :${widget.tempCar!['id']}');
 
       final response = widget.isEdit
           ? await http.post(
-        Uri.parse('http://10.0.2.2:8000/api/update-institution-cars/${widget.tempCar!['id']}'),
+        Uri.parse('${Config.BASE_URL}/update-institution-cars/${widget.tempCar!['id']}'),
         body: json.encode(payload),
         headers: {
           'Content-Type': 'application/json',
@@ -260,7 +256,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
         },
       )
           : await http.post(
-        Uri.parse('http://10.0.2.2:8000/api/add-cars'),
+        Uri.parse('${Config.BASE_URL}/add-cars'),
         body: json.encode(payload),
         headers: {
           'Content-Type': 'application/json',
@@ -297,15 +293,10 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedColor = _formData['color']?.toUpperCase() ?? 'GREEN'; // <-- Correctement placé ici
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isEdit ? 'Edit Car' : 'Add Car', style: TextStyle(color: Colors.white)),
-        centerTitle: true,
-        backgroundColor: Colors.green,
-        elevation: 0,
+        title: Text(widget.isEdit ? 'Edit Car' : 'Add Car'),
       ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -374,12 +365,9 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   Expanded(
                     child: TextFormField(
                       initialValue: _formData['tagNumber1'],
-                      decoration: InputDecoration(
-                        labelText: "Tag Number Part 1",
-                        prefixIcon: const Icon(Icons.tag, color: Colors.grey),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                      decoration: const InputDecoration(
+                        labelText: 'Tag Number Part 1',
+                        border: OutlineInputBorder(),
                       ),
                       onChanged: (value) {
                         setState(() {
@@ -392,13 +380,10 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   Expanded(
                     child: TextFormField(
                       initialValue: _formData['tagNumber2'],
-                        decoration: InputDecoration(
-                          labelText: "Tag Number Part 2",
-                          prefixIcon: const Icon(Icons.tag, color: Colors.grey),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
+                      decoration: const InputDecoration(
+                        labelText: 'Tag Number Part 2',
+                        border: OutlineInputBorder(),
+                      ),
                       onChanged: (value) {
                         setState(() {
                           _formData['tagNumber2'] = value;
@@ -413,13 +398,9 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               // Manufacture Year
               TextFormField(
                 initialValue: _formData['manuYear'],
-                keyboardType: TextInputType.numberWithOptions(signed: false),
-                decoration: InputDecoration(
-                  labelText: "Manufacture year",
-                  prefixIcon: const Icon(Icons.calendar_month, color: Colors.grey),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                decoration: const InputDecoration(
+                  labelText: 'Manufacture Year',
+                  border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -432,13 +413,9 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               // Price Per Day
               TextFormField(
                 initialValue: _formData['pricePerDay'],
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: "Price Per Day",
-                  prefixIcon: const Icon(Icons.monetization_on_rounded, color: Colors.grey),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                decoration: const InputDecoration(
+                  labelText: 'Price Per Day',
+                  border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -451,13 +428,9 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               // Price Per Week
               TextFormField(
                 initialValue: _formData['pricePerWeek'],
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: "Price Per Week",
-                  prefixIcon: const Icon(Icons.monetization_on_rounded, color: Colors.grey),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                decoration: const InputDecoration(
+                  labelText: 'Price Per Week',
+                  border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -470,13 +443,9 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               // Price Per Month
               TextFormField(
                 initialValue: _formData['pricePerMonth'],
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: "Price Per Week",
-                  prefixIcon: const Icon(Icons.monetization_on_rounded, color: Colors.grey),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                decoration: const InputDecoration(
+                  labelText: 'Price Per Month',
+                  border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -600,78 +569,125 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               ),
               const SizedBox(height: 16),
 
-           Column(
-            children: [
-              FutureBuilder<List<Map<String, dynamic>>>(
-                future: fetchCountries(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text("Erreur de chargement des pays");
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Text("Aucun pays disponible");
-                  }
+              Column(
+                  children: [
+                    FutureBuilder<List<Map<String, dynamic>>>(
+                      future: fetchCountries(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text("Erreur de chargement des pays");
+                        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          return Text("Aucun pays disponible");
+                        }
 
-                  List<Map<String, dynamic>> countries = snapshot.data!;
+                        List<Map<String, dynamic>> countries = snapshot.data!;
 
-                  return DropdownButtonFormField<int>(
-                    value: selectedCountryId, // ✅ Utilise l'ID du pays comme valeur sélectionnée
-                    items: countries.map((country) {
-                      return DropdownMenuItem<int>(
-                        value: country["id"], // ✅ Utilisation de l'ID du pays
-                        child: Text(country["name"]), // ✅ Affichage du nom du pays
-                      );
-                    }).toList(),
-                    onChanged: (value) async {
-                      setState(() {
-                        selectedCountryId = value; // ✅ Stocke l'ID du pays sélectionné
-                        selectedCountry = countries.firstWhere((country) => country["id"] == value)["name"]; // ✅ Stocke le nom du pays
-                        selectedCity = null;
-                        cities = [];
-                      });
+                        return DropdownButtonFormField<int>(
+                          value: selectedCountryId, // ✅ Utilise l'ID du pays comme valeur sélectionnée
+                          items: countries.map((country) {
+                            return DropdownMenuItem<int>(
+                              value: country["id"], // ✅ Utilisation de l'ID du pays
+                              child: Text(country["name"]), // ✅ Affichage du nom du pays
+                            );
+                          }).toList(),
+                          onChanged: (value) async {
+                            setState(() {
+                              selectedCountryId = value; // ✅ Stocke l'ID du pays sélectionné
+                              selectedCountry = countries.firstWhere((country) => country["id"] == value)["name"]; // ✅ Stocke le nom du pays
+                              selectedCity = null;
+                              cities = [];
+                            });
 
-                      // ✅ Charger les villes du pays sélectionné
-                      List<String> fetchedCities = await fetchCities(value!);
-                      setState(() {
-                        cities = fetchedCities;
-                      });
-                    },
-                    decoration: InputDecoration(labelText: "اختر البلد"),
-                  );
-                },
+                            // ✅ Charger les villes du pays sélectionné
+                            List<String> fetchedCities = await fetchCities(value!);
+                            setState(() {
+                              cities = fetchedCities;
+                            });
+                          },
+                          decoration: InputDecoration(labelText: "اختر البلد"),
+                        );
+                      },
+                    ),
+
+                    if (cities.isNotEmpty)
+                      DropdownButtonFormField<String>(
+                        value: selectedCity,
+                        items: cities.map((String city) {
+                          return DropdownMenuItem<String>(
+                            value: city,
+                            child: Text(city),
+                          );
+                        }).toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedCity = value;
+                          });
+                        },
+                        decoration: InputDecoration(labelText: "موقع الاستلام"),
+                      ),
+
+                  ]
               ),
-
-              if (cities.isNotEmpty)
-                DropdownButtonFormField<String>(
-                  value: selectedCity,
-                  items: cities.map((String city) {
-                    return DropdownMenuItem<String>(
-                      value: city,
-                      child: Text(city),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedCity = value;
-                    });
-                  },
-                  decoration: InputDecoration(labelText: "موقع الاستلام"),
-                ),
-
-              ]
-          ),
               const SizedBox(height: 16),
 
-
+              // City Dropdown
+              // DropdownButtonFormField(
+              //   value: _formData['city'],
+              //   items: [
+              //     DropdownMenuItem(
+              //       value: null,
+              //       child: Text('Select City'),
+              //     ),
+              //     ...cities.map((city) {
+              //       return DropdownMenuItem(
+              //         value: city,
+              //         child: Text(city),
+              //       );
+              //     }).toList(),
+              //   ],
+              //   onChanged: (value) {
+              //     setState(() {
+              //       _formData['city'] = value ?? '';
+              //     });
+              //   },
+              //   decoration: const InputDecoration(
+              //     labelText: 'City',
+              //     border: OutlineInputBorder(),
+              //   ),
+              // ),
               const SizedBox(height: 16),
 
               DropdownButtonFormField<String>(
-                value: _formData['color']?.isEmpty ?? true ? null : _formData['color'], // Gérer le cas où la valeur est vide
+                value: _formData['color']?.isEmpty ?? true ? null : _formData['color'], // Vérification null-safe
                 items: colors.map((String color) {
+                  // Trouver l'objet color correspondant dans colorOptions
+                  final colorOption = colorOptions.firstWhere(
+                        (option) => option['label'] == color,
+                    orElse: () => { 'label': 'UNKNOWN', 'color': '#000000' }, // Ajout de 'label'
+                  );
+
+                  // Vérifier que colorOption['color'] n'est pas null
+                  final colorHex = (colorOption['color'] ?? '#000000') as String;
+                  final colorValue = colorHex.replaceAll('#', '0xFF');
+
                   return DropdownMenuItem<String>(
-                    value: color, // Assurez-vous que chaque valeur est unique
-                    child: Text(color),
+                    value: color,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 20,
+                          height: 20,
+                          margin: const EdgeInsets.only(right: 10),
+                          decoration: BoxDecoration(
+                            color: Color(int.parse(colorValue)),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                        Text(color),
+                      ],
+                    ),
                   );
                 }).toList(),
                 onChanged: (value) {
