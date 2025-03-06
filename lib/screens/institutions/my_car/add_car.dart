@@ -297,7 +297,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final selectedColor = _formData['color']?.toUpperCase(); // <-- Correctement placé ici
+    final selectedColor = _formData['color']?.toUpperCase() ?? 'GREEN'; // <-- Correctement placé ici
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.isEdit ? 'Edit Car' : 'Add Car', style: TextStyle(color: Colors.white)),
@@ -667,34 +667,11 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               const SizedBox(height: 16),
 
               DropdownButtonFormField<String>(
-                value: selectedColor, // Utiliser la valeur normalisée
+                value: _formData['color']?.isEmpty ?? true ? null : _formData['color'], // Gérer le cas où la valeur est vide
                 items: colors.map((String color) {
-                  // Trouver l'objet color correspondant dans colorOptions
-                  final colorOption = colorOptions.firstWhere(
-                        (option) => (option['label'] ?? '').toUpperCase() == color.toUpperCase(), // Comparaison insensible à la casse
-                    orElse: () => { 'label': 'UNKNOWN', 'color': '#000000' }, // Ajout de 'label'
-                  );
-
-                  // Vérifier que colorOption['color'] n'est pas null
-                  final colorHex = (colorOption['color'] ?? '#000000') as String;
-                  final colorValue = colorHex.replaceAll('#', '0xFF');
-
                   return DropdownMenuItem<String>(
-                    value: color, // Utiliser la valeur en majuscules
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 20,
-                          height: 20,
-                          margin: const EdgeInsets.only(right: 10),
-                          decoration: BoxDecoration(
-                            color: Color(int.parse(colorValue)),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                        ),
-                        Text(color),
-                      ],
-                    ),
+                    value: color, // Assurez-vous que chaque valeur est unique
+                    child: Text(color),
                   );
                 }).toList(),
                 onChanged: (value) {
