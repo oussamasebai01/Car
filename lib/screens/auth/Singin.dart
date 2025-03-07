@@ -38,6 +38,7 @@ class _SignInScreenState extends State<SignInScreen> {
       'email': _emailController.text,
       'password': _passwordController.text,
     };
+print(requestBody);
 
     try {
       // Send POST request to the API
@@ -46,7 +47,7 @@ class _SignInScreenState extends State<SignInScreen> {
         headers: {'Content-Type': 'application/json'},
         body: json.encode(requestBody),
       );
-
+print (response.headers);
       // Check the response status code
       if (response.statusCode == 200) {
 

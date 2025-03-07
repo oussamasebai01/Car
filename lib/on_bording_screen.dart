@@ -14,6 +14,7 @@ class OnBordingScreen extends StatefulWidget {
 class _OnBordingScreenState extends State<OnBordingScreen> {
   int pageIndex = 0;
   final PageController _pageController = PageController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,59 +25,64 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
   SafeArea bodyMethod(BuildContext context) {
     return SafeArea(
       child: SizedBox(
-          height: 93.5.h,
-          width: 80.h,
-          child: Column(
-            children: [
-              SizedBox(
-                height: 78.6.h,
-                child: PageView(
-                  controller: _pageController,
-                  onPageChanged: (value) {
-                    setState(() => pageIndex = value);
-                  },
-                  children: [
-                    intro1(),
-                    intro2(),
-                    intro3(),
-                  ],
-                ),
+        height: 93.5.h,
+        width: 80.h,
+        child: Column(
+          children: [
+            SizedBox(
+              height: 78.6.h,
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (value) {
+                  setState(() => pageIndex = value);
+                },
+                children: [
+                  intro1(),
+                  intro2(),
+                  intro3(),
+                ],
               ),
-              ElevatedButton(
-                  onPressed: pageIndex != 2
-                      ? () {
-                    _pageController.animateToPage(pageIndex + 1,
-                        duration: Duration(milliseconds: 500),
-                        curve: Curves.fastLinearToSlowEaseIn);
-                  }
-                      : () {
-                    Navigator.popUntil(context, (route) => route.isFirst);
-                    Navigator.pushReplacementNamed(
-                        context, '/DashboardClient');
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    backgroundColor: primaryColor,
-                  ),
-                  child: Text(
-                    pageIndex == 2 ? "Commencer" : "Suivant",
-                    style: TextStyle(color: Colors.white, fontSize: 16),
-                  )),
-              GestureDetector(
-                  onTap: () {
-                    if (pageIndex != 2) {
-                      _pageController.animateToPage(2,
-                          duration: Duration(milliseconds: 1500),
-                          curve: Curves.fastLinearToSlowEaseIn);
-                    }
-                  },
-                  child: Text(pageIndex != 2 ? "Passer" : '',
-                      style: dustyGrayMedium12sp))
-            ],
-          )),
+            ),
+            ElevatedButton(
+              onPressed: pageIndex != 2
+                  ? () {
+                _pageController.animateToPage(pageIndex + 1,
+                    duration: Duration(milliseconds: 500),
+                    curve: Curves.fastLinearToSlowEaseIn);
+              }
+                  : () {
+                Navigator.popUntil(context, (route) => route.isFirst);
+                Navigator.pushReplacementNamed(
+                    context, '/DashboardClient');
+              },
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                backgroundColor: primaryColor,
+              ),
+              child: Text(
+                pageIndex == 2 ? "ابدأ الآن" : "التالي",
+                style: TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                if (pageIndex != 2) {
+                  _pageController.animateToPage(2,
+                      duration: Duration(milliseconds: 1500),
+                      curve: Curves.fastLinearToSlowEaseIn);
+                }
+              },
+              child: Text(
+                pageIndex != 2 ? "تخطي" : '',
+                style: dustyGrayMedium12sp,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -92,7 +98,7 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
         Column(
           children: [
             AutoSizeText(
-              "Bienvenue dans notre application",
+              "مرحبًا بك في تطبيق GO Sayara",
               style: blackSemiBold17sp,
               maxLines: 1,
             ),
@@ -100,7 +106,7 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
             SizedBox(
               width: 90.w,
               child: AutoSizeText(
-                "Louez votre voiture en toute simplicité et rapidité.",
+                "يمكنك استئجار العديد من السيارات بسهولة من خلال تطبيق GO Sayara.",
                 style: dustyGrayMedium12sp,
                 textAlign: TextAlign.center,
                 maxLines: 5,
@@ -117,9 +123,9 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
                 dotWidth: .75.h,
                 activeDotScale: .25.h,
               ),
-            )
+            ),
           ],
-        )
+        ),
       ],
     );
   }
@@ -136,7 +142,7 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
         Column(
           children: [
             AutoSizeText(
-              "Large choix de véhicules",
+              "تمتع بخيارات متعددة",
               style: blackSemiBold17sp,
               maxLines: 1,
             ),
@@ -144,7 +150,7 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
             SizedBox(
               width: 90.w,
               child: AutoSizeText(
-                "Trouvez la voiture parfaite pour votre voyage.",
+                "نضمن لك العثور على السيارة التي تناسب احتياجاتك بكل سهولة.",
                 style: dustyGrayMedium12sp,
                 textAlign: TextAlign.center,
                 maxLines: 5,
@@ -161,9 +167,9 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
                 dotWidth: .75.h,
                 activeDotScale: .25.h,
               ),
-            )
+            ),
           ],
-        )
+        ),
       ],
     );
   }
@@ -180,7 +186,7 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
         Column(
           children: [
             AutoSizeText(
-              "Réservez en toute confiance",
+              "احجز بكل ثقة",
               style: blackSemiBold17sp,
               maxLines: 1,
             ),
@@ -188,7 +194,7 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
             SizedBox(
               width: 90.w,
               child: AutoSizeText(
-                "Profitez d'un service fiable et sécurisé.",
+                "استمتع بخدمة موثوقة وآمنة لاستئجار السيارات.",
                 style: dustyGrayMedium12sp,
                 textAlign: TextAlign.center,
                 maxLines: 5,
@@ -205,9 +211,9 @@ class _OnBordingScreenState extends State<OnBordingScreen> {
                 dotWidth: .75.h,
                 activeDotScale: .25.h,
               ),
-            )
+            ),
           ],
-        )
+        ),
       ],
     );
   }

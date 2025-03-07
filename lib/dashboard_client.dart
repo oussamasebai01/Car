@@ -158,7 +158,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Rechercher une voiture"),
+        title: Text("البحث عن سيارة"),
         actions: [
           IconButton(
             icon: Icon(Icons.login),
