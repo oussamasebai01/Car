@@ -84,6 +84,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
     });
 
     try {
+      print("try");
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -95,14 +96,17 @@ class _CarSearchPageState extends State<CarSearchPage> {
         print(responseData);
         setState(() {
           cars = (responseData['data'] as List)
-              .map((carJson) => CarModel.fromJson(carJson))
+              .map((carJson) => CarModel.fromJson(carJson)) // Use the updated fromJson method
               .toList();
           print(cars);
+          print("Parsed Car: ${CarModel.fromJson(responseData['data'][0])}");
+
         });
       } else {
         throw Exception('Failed to load cars: ${response.statusCode}');
       }
     } catch (e) {
+      print("error : $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Erreur lors de la recherche de voitures: $e")),
       );

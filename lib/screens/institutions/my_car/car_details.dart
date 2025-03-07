@@ -15,7 +15,7 @@ class CarDetailsPageI extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(car.modelName), // Utiliser car.modelName comme titre
+        title: Text(car.modelName!), // Utiliser car.modelName comme titre
         backgroundColor: Colors.green, // AppBar noire pour un style moderne
         elevation: 0, // Supprimer l'ombre
       ),
@@ -105,7 +105,7 @@ class CarDetailsPageI extends StatelessWidget {
                             size: 24,
                             color: Colors.green,
                           ),
-                          Text(" "+car.gazType, style: TextStyle(fontSize: 16)),
+                          Text(" "+car.gazType!, style: TextStyle(fontSize: 16)),
                         ],
                       ),
 
@@ -124,7 +124,7 @@ class CarDetailsPageI extends StatelessWidget {
                             size: 24,
                             color: Colors.green,
                           ),
-                          Text("  "+car.carColor, style: TextStyle(fontSize: 16)),
+                          Text("  "+car.carColor!, style: TextStyle(fontSize: 16)),
                         ],
                       ),
 

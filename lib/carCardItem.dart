@@ -34,7 +34,7 @@ class CarCardItem extends StatelessWidget {
               children: [
                 // Nom du modèle et fabricant
                 Text(
-                  car.modelName,
+                  car.modelName!,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -42,7 +42,7 @@ class CarCardItem extends StatelessWidget {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  car.manufacturerName,
+                  car.manufacturerName!,
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey[600],

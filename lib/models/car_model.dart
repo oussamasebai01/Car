@@ -37,27 +37,27 @@ class CarModel {
     required this.pricePerWeek,
     required this.pricePerYear,
   });
-
   factory CarModel.fromJson(Map<String, dynamic> json) {
     return CarModel(
-      id: json['id'],
-      tagNumber: json['tagNumber'],
-      pricePerDay: json['price_per_day'].toDouble(),
-      carColor: json['car_color'],
-      city: json['city'],
-      gazType: json['gaz_type'],
-      transmission: json['transmission'],
-      seatNumber: json['seat_number'],
-      modelName: json['model']['name_en'],
-      manufacturerName: json['model']['manufacture']['name_en'],
-      institutionName: json['institution']['name'],
-      availability: json['availability'],
-      manu_year: json['manu_year'],
-        pricePerMonth: json['price_per_month'],
-        pricePerWeek:json['price_per_week'],
-        pricePerYear:json['price_per_year']
+      id: json['id'] as int, // Explicitly cast to int
+      tagNumber: json['tagNumber'] as String, // Explicitly cast to String
+      pricePerDay: (json['price_per_day'] as num?)?.toDouble() ?? 0.0, // Handle null and cast to double
+      carColor: json['car_color'] as String,
+      city: json['city'] as String,
+      gazType: json['gaz_type'] as String,
+      transmission: json['transmission'] as String,
+      seatNumber: json['seat_number'] as int,
+      modelName: json['model']['name_en'] as String,
+      manufacturerName: json['model']['manufacture']['name_en'] as String,
+      institutionName: json['institution']['name'] as String,
+      availability: json['availability'] as int,
+      manu_year: int.tryParse(json['manu_year'].toString()) ?? 0, // Convert string to int
+      pricePerMonth: (json['price_per_month'] as num?)?.toDouble() ?? 0.0, // Handle null and cast to double
+      pricePerWeek: (json['price_per_week'] as num?)?.toDouble() ?? 0.0, // Handle null and cast to double
+      pricePerYear: (json['price_per_year'] as num?)?.toDouble() ?? 0.0, // Handle null and cast to double
     );
   }
+
   // Méthode pour convertir l'objet en Map<String, dynamic>
   Map<String, dynamic> toJson() {
     return {
