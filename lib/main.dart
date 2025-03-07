@@ -2,9 +2,13 @@ import 'package:car/screens/Auth/Singin.dart';
 import 'package:car/screens/Auth/forgetpassword.dart';
 import 'package:car/screens/Auth/otpverify.dart';
 import 'package:car/screens/auth/Signup_screen.dart';
+import 'package:car/screens/institutions/BookingList.dart';
+import 'package:car/screens/institutions/CanceledList.dart';
 import 'package:car/screens/institutions/DashboardInstitution.dart';
+import 'package:car/screens/institutions/FinishedList.dart';
 import 'package:car/screens/institutions/bookingRequest.dart';
 import 'package:car/screens/institutions/my_car/car_liste.dart';
+import 'package:car/screens/institutions/rejectedList.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'dashboard_client.dart';
@@ -59,9 +63,25 @@ class MyApp extends StatelessWidget {
               // Replace with your actual Dashboard Institution screen widget
               return MyBookingScreen ();
             },
-            "/bookingrequest": (context) {
+            "/booking-request": (context) {
               // Replace with your actual Booking Request screen widget
               return BookingRequestScreen ();
+            },
+            "/rejected_list": (context) {
+              // Replace with your actual rejected screen widget
+              return RejectedScreen ();
+            },
+            "/finished_bookings": (context) {
+              // Replace with your actual finished_bookings screen widget
+              return FinishedScreen ();
+            },
+            "/cancelled_list": (context) {
+              // Replace with your actual cancelled_list screen widget
+              return CanceledListScreen ();
+            },
+            "/booking_list": (context) {
+              // Replace with your actual cancelled_list screen widget
+              return BookingListScreen ();
             },
           },
         );

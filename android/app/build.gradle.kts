@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.example.car"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "27.0.12077973"
     // Set the NDK version explicitly
    // ndkVersion = "27.0.12077973"
 
