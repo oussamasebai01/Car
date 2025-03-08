@@ -27,7 +27,7 @@ class _BookingListScreenState extends State<BookingListScreen> {
     String? token = prefs.getString('auth_token'); // Replace 'auth_token' with your key
 
     if (token == null) {
-      throw Exception('User is not authenticated');
+      throw Exception('المستخدم غير مسجل الدخول');
     }
 
     final response = await http.get(
@@ -43,7 +43,7 @@ class _BookingListScreenState extends State<BookingListScreen> {
       List<Booking> bookings = body.map((dynamic item) => Booking.fromJson(item)).toList();
       return bookings;
     } else {
-      throw Exception('Failed to load tenant bookings: ${response.statusCode}');
+      throw Exception('فشل في تحميل حجوزات المستأجرين: ${response.statusCode}');
     }
   }
 
@@ -53,7 +53,7 @@ class _BookingListScreenState extends State<BookingListScreen> {
     String? token = prefs.getString('auth_token');
 
     if (token == null) {
-      throw Exception('User is not authenticated');
+      throw Exception('المستخدم غير مسجل الدخول');
     }
 
     final response = await http.post(
@@ -75,11 +75,11 @@ class _BookingListScreenState extends State<BookingListScreen> {
         futureBookings = fetchTenantBookings(); // Refresh the list
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Booking finished successfully')),
+        SnackBar(content: Text('تم إنهاء الحجز بنجاح')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to finish booking: ${response.statusCode}')),
+        SnackBar(content: Text('فشل في إنهاء الحجز: ${response.statusCode}')),
       );
     }
   }
@@ -92,13 +92,13 @@ class _BookingListScreenState extends State<BookingListScreen> {
       builder: (BuildContext context) {
         String inputValue = ''; // Variable to store the user's input
         return AlertDialog(
-          title: Text('Cancel Booking'),
+          title: Text('إلغاء الحجز'),
           content: TextField(
             onChanged: (value) {
               inputValue = value; // Update the input value as the user types
             },
             decoration: InputDecoration(
-              hintText: 'Enter cancellation reason',
+              hintText: 'أدخل سبب الإلغاء',
               border: OutlineInputBorder(),
             ),
           ),
@@ -107,13 +107,13 @@ class _BookingListScreenState extends State<BookingListScreen> {
               onPressed: () {
                 Navigator.pop(context); // Close the dialog without saving
               },
-              child: Text('Cancel'),
+              child: Text('إلغاء'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context, inputValue); // Close the dialog and return the input value
               },
-              child: Text('Submit'),
+              child: Text('إرسال'),
             ),
           ],
         );
@@ -123,7 +123,7 @@ class _BookingListScreenState extends State<BookingListScreen> {
     // If the user cancels the dialog or doesn't provide a description, do nothing
     if (description == null || description.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Cancellation reason is required')),
+        SnackBar(content: Text('سبب الإلغاء مطلوب')),
       );
       return;
     }
@@ -133,7 +133,7 @@ class _BookingListScreenState extends State<BookingListScreen> {
 
     if (token == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User is not authenticated')),
+        SnackBar(content: Text('المستخدم غير مسجل الدخول')),
       );
       return;
     }
@@ -160,11 +160,11 @@ class _BookingListScreenState extends State<BookingListScreen> {
         futureBookings = fetchTenantBookings(); // Refresh the list
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Booking canceled successfully')),
+        SnackBar(content: Text('تم إلغاء الحجز بنجاح')),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to cancel booking: ${response.statusCode}')),
+        SnackBar(content: Text('فشل في إلغاء الحجز: ${response.statusCode}')),
       );
     }
   }
@@ -173,7 +173,7 @@ class _BookingListScreenState extends State<BookingListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Tenant Bookings', style: TextStyle(color: Colors.white)),
+        title: Text('قائمة الحجوزات', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.green, // Green theme for the app bar
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white), // Custom back button
@@ -189,9 +189,9 @@ class _BookingListScreenState extends State<BookingListScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator(color: Colors.green));
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.red)));
+            return Center(child: Text('خطأ: ${snapshot.error}', style: TextStyle(color: Colors.red)));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No tenant bookings found.', style: TextStyle(color: Colors.grey)));
+            return Center(child: Text('لا توجد حجوزات للمستأجرين.', style: TextStyle(color: Colors.grey)));
           } else {
             List<Booking> bookings = snapshot.data!;
             return ListView.builder(
@@ -228,15 +228,15 @@ class _BookingListScreenState extends State<BookingListScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildDetailRow(Icons.email, 'Email: ${booking.email}'),
-                            _buildDetailRow(Icons.phone, 'Phone: ${booking.phoneNumber}'),
+                            _buildDetailRow(Icons.email, 'البريد الإلكتروني: ${booking.email}'),
+                            _buildDetailRow(Icons.phone, 'الهاتف: ${booking.phoneNumber}'),
                             if (booking.whatsappNumber != null)
-                              _buildDetailRow(Icons.phone_android, 'WhatsApp: ${booking.whatsappNumber}'),
-                            _buildDetailRow(Icons.location_on, 'Address: ${booking.street}, ${booking.buildingNumber}'),
+                              _buildDetailRow(Icons.phone_android, 'واتساب: ${booking.whatsappNumber}'),
+                            _buildDetailRow(Icons.location_on, 'العنوان: ${booking.street}, ${booking.buildingNumber}'),
                             if (booking.nearestLocation != null)
-                              _buildDetailRow(Icons.location_on, 'Nearest Location: ${booking.nearestLocation}'),
+                              _buildDetailRow(Icons.location_on, 'أقرب موقع: ${booking.nearestLocation}'),
                             SizedBox(height: 10),
-                            Text('Driver License:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+                            Text('رخصة القيادة:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
                             SizedBox(height: 5),
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8), // Rounded corners for the image
@@ -259,7 +259,7 @@ class _BookingListScreenState extends State<BookingListScreen> {
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('ID Picture:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+                                  Text('صورة الهوية:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
                                   SizedBox(height: 5),
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(8), // Rounded corners for the image
@@ -280,10 +280,10 @@ class _BookingListScreenState extends State<BookingListScreen> {
                                 ],
                               ),
                             SizedBox(height: 10),
-                            _buildDetailRow(Icons.payment, 'Payment Method: ${booking.paymentMethod}'),
-                            _buildDetailRow(Icons.attach_money, 'Total Price: \$${booking.totalPrice.toStringAsFixed(2)}'),
-                            _buildDetailRow(Icons.calendar_today, 'Rent Date: ${booking.rentDate.toLocal()}'),
-                            _buildDetailRow(Icons.calendar_today, 'Return Date: ${booking.returnDate.toLocal()}'),
+                            _buildDetailRow(Icons.payment, 'طريقة الدفع: ${booking.paymentMethod}'),
+                            _buildDetailRow(Icons.attach_money, 'السعر الإجمالي: \$${booking.totalPrice.toStringAsFixed(2)}'),
+                            _buildDetailRow(Icons.calendar_today, 'تاريخ الإيجار: ${booking.rentDate.toLocal()}'),
+                            _buildDetailRow(Icons.calendar_today, 'تاريخ الإرجاع: ${booking.returnDate.toLocal()}'),
                             SizedBox(height: 10),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -297,7 +297,7 @@ class _BookingListScreenState extends State<BookingListScreen> {
                                       borderRadius: BorderRadius.circular(8), // Rounded corners for the button
                                     ),
                                   ),
-                                  child: Text('Finish Booking', style: TextStyle(color: Colors.white)),
+                                  child: Text('إنهاء الحجز', style: TextStyle(color: Colors.white)),
                                 ),
                                 SizedBox(width: 10), // Add spacing between buttons
                                 ElevatedButton(
@@ -309,7 +309,7 @@ class _BookingListScreenState extends State<BookingListScreen> {
                                       borderRadius: BorderRadius.circular(8), // Rounded corners for the button
                                     ),
                                   ),
-                                  child: Text('Cancel Booking', style: TextStyle(color: Colors.white)),
+                                  child: Text('إلغاء الحجز', style: TextStyle(color: Colors.white)),
                                 ),
                               ],
                             ),

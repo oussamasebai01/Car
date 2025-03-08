@@ -27,7 +27,7 @@ class _CanceledListScreenState extends State<CanceledListScreen> {
     String? token = prefs.getString('auth_token'); // Replace 'auth_token' with your key
 
     if (token == null) {
-      throw Exception('User is not authenticated');
+      throw Exception('المستخدم غير مسجل الدخول');
     }
 
     final response = await http.get(
@@ -49,7 +49,7 @@ class _CanceledListScreenState extends State<CanceledListScreen> {
       List<Canceled> canceledClients = data.map((dynamic item) => Canceled.fromJson(item)).toList();
       return canceledClients;
     } else {
-      throw Exception('Failed to load canceled clients: ${response.statusCode}');
+      throw Exception('فشل في تحميل الحجوزات الملغاة: ${response.statusCode}');
     }
   }
 
@@ -57,7 +57,7 @@ class _CanceledListScreenState extends State<CanceledListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Canceled Bookings', style: TextStyle(color: Colors.white)),
+        title: Text('الحجوزات الملغاة', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.green, // Green theme for the app bar
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white), // Custom back button
@@ -73,9 +73,9 @@ class _CanceledListScreenState extends State<CanceledListScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator(color: Colors.green));
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.red)));
+            return Center(child: Text('خطأ: ${snapshot.error}', style: TextStyle(color: Colors.red)));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No canceled bookings found.', style: TextStyle(color: Colors.grey)));
+            return Center(child: Text('لا توجد حجوزات ملغاة.', style: TextStyle(color: Colors.grey)));
           } else {
             List<Canceled> canceledClients = snapshot.data!;
             return ListView.builder(
@@ -112,12 +112,12 @@ class _CanceledListScreenState extends State<CanceledListScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildDetailRow(Icons.email, 'Email: ${canceled.email}'),
-                            _buildDetailRow(Icons.phone, 'Phone: ${canceled.phoneNumber}'),
-                            _buildDetailRow(Icons.phone_android, 'WhatsApp: ${canceled.whatsappNumber}'),
-                            _buildDetailRow(Icons.location_on, 'Address: ${canceled.street}, ${canceled.buildingNumber}, ${canceled.nearestLocation}'),
+                            _buildDetailRow(Icons.email, 'البريد الإلكتروني: ${canceled.email}'),
+                            _buildDetailRow(Icons.phone, 'الهاتف: ${canceled.phoneNumber}'),
+                            _buildDetailRow(Icons.phone_android, 'واتساب: ${canceled.whatsappNumber}'),
+                            _buildDetailRow(Icons.location_on, 'العنوان: ${canceled.street}, ${canceled.buildingNumber}, ${canceled.nearestLocation}'),
                             SizedBox(height: 10),
-                            Text('Driver License:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+                            Text('رخصة القيادة:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
                             SizedBox(height: 5),
                             if (canceled.driverLicense != null)
                               ClipRRect(
@@ -137,7 +137,7 @@ class _CanceledListScreenState extends State<CanceledListScreen> {
                                 ),
                               ),
                             SizedBox(height: 10),
-                            Text('ID Picture:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+                            Text('صورة الهوية:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
                             SizedBox(height: 5),
                             if (canceled.idPicture != null)
                               ClipRRect(
@@ -157,11 +157,11 @@ class _CanceledListScreenState extends State<CanceledListScreen> {
                                 ),
                               ),
                             SizedBox(height: 10),
-                            _buildDetailRow(Icons.payment, 'Payment Method: ${canceled.paymentMethod}'),
-                            _buildDetailRow(Icons.attach_money, 'Total Price: \$${canceled.totalPrice.toStringAsFixed(2)}'),
-                            _buildDetailRow(Icons.calendar_today, 'Rent Date: ${canceled.rentDate}'),
-                            _buildDetailRow(Icons.calendar_today, 'Return Date: ${canceled.returnDate}'),
-                            _buildDetailRow(Icons.description, 'Description: ${canceled.description}'), // Added description
+                            _buildDetailRow(Icons.payment, 'طريقة الدفع: ${canceled.paymentMethod}'),
+                            _buildDetailRow(Icons.attach_money, 'السعر الإجمالي: \$${canceled.totalPrice.toStringAsFixed(2)}'),
+                            _buildDetailRow(Icons.calendar_today, 'تاريخ الإيجار: ${canceled.rentDate}'),
+                            _buildDetailRow(Icons.calendar_today, 'تاريخ الإرجاع: ${canceled.returnDate}'),
+                            _buildDetailRow(Icons.description, 'الوصف: ${canceled.description}'), // Added description
                           ],
                         ),
                       ),

@@ -27,7 +27,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
     String? token = prefs.getString('auth_token'); // Replace 'auth_token' with your key
 
     if (token == null) {
-      throw Exception('User is not authenticated');
+      throw Exception('المستخدم غير مسجل الدخول');
     }
 
     final response = await http.get(
@@ -43,7 +43,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
       List<Client> clients = body.map((dynamic item) => Client.fromJson(item)).toList();
       return clients;
     } else {
-      throw Exception('Failed to load pending clients: ${response.statusCode}');
+      throw Exception('فشل في تحميل العملاء المعلقين: ${response.statusCode}');
     }
   }
 
@@ -53,7 +53,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
     String? token = prefs.getString('auth_token');
 
     if (token == null) {
-      throw Exception('User is not authenticated');
+      throw Exception('المستخدم غير مسجل الدخول');
     }
 
     final response = await http.post(
@@ -70,10 +70,10 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
         futureClients = fetchPendingClients(); // Refresh the list
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Client approved successfully')),
+        SnackBar(content: Text('تمت الموافقة على العميل بنجاح')),
       );
     } else {
-      throw Exception('Failed to approve client: ${response.statusCode}');
+      throw Exception('فشل في الموافقة على العميل: ${response.statusCode}');
     }
   }
 
@@ -84,7 +84,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
 
     if (token == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('User is not authenticated')),
+        SnackBar(content: Text('المستخدم غير مسجل الدخول')),
       );
       return;
     }
@@ -95,13 +95,13 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
       builder: (BuildContext context) {
         String inputValue = ''; // Variable to store the user's input
         return AlertDialog(
-          title: Text('Reject Client'),
+          title: Text('رفض العميل'),
           content: TextField(
             onChanged: (value) {
               inputValue = value; // Update the input value as the user types
             },
             decoration: InputDecoration(
-              hintText: 'Enter rejection reason',
+              hintText: 'أدخل سبب الرفض',
               border: OutlineInputBorder(),
             ),
           ),
@@ -110,13 +110,13 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
               onPressed: () {
                 Navigator.pop(context); // Close the dialog without saving
               },
-              child: Text('Cancel'),
+              child: Text('إلغاء'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.pop(context, inputValue); // Close the dialog and return the input value
               },
-              child: Text('Submit'),
+              child: Text('إرسال'),
             ),
           ],
         );
@@ -126,7 +126,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
     // If the user cancels the dialog, do nothing
     if (description == null || description.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Rejection reason is required')),
+        SnackBar(content: Text('سبب الرفض مطلوب')),
       );
       return;
     }
@@ -154,16 +154,16 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
           futureClients = fetchPendingClients(); // Refresh the list
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Client rejected successfully')),
+          SnackBar(content: Text('تم رفض العميل بنجاح')),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to reject client: ${response.statusCode}')),
+          SnackBar(content: Text('فشل في رفض العميل: ${response.statusCode}')),
         );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(content: Text('خطأ: $e')),
       );
     }
   }
@@ -172,7 +172,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Booking Requests', style: TextStyle(color: Colors.white)),
+        title: Text('طلبات الحجز', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.green, // Green theme for the app bar
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white), // Custom back button
@@ -188,9 +188,9 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator(color: Colors.green));
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.red)));
+            return Center(child: Text('خطأ: ${snapshot.error}', style: TextStyle(color: Colors.red)));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No pending clients found.', style: TextStyle(color: Colors.grey)));
+            return Center(child: Text('لا توجد عملاء معلقين.', style: TextStyle(color: Colors.grey)));
           } else {
             List<Client> clients = snapshot.data!;
             return ListView.builder(
@@ -227,12 +227,12 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildDetailRow(Icons.email, 'Email: ${client.email}'),
-                            _buildDetailRow(Icons.phone, 'Phone: ${client.phoneNumber}'),
-                            _buildDetailRow(Icons.phone_android, 'WhatsApp: ${client.whatsappNumber}'),
-                            _buildDetailRow(Icons.location_on, 'Address: ${client.street}, ${client.buildingNumber}, ${client.nearestLocation}'),
+                            _buildDetailRow(Icons.email, 'البريد الإلكتروني: ${client.email}'),
+                            _buildDetailRow(Icons.phone, 'الهاتف: ${client.phoneNumber}'),
+                            _buildDetailRow(Icons.phone_android, 'واتساب: ${client.whatsappNumber}'),
+                            _buildDetailRow(Icons.location_on, 'العنوان: ${client.street}, ${client.buildingNumber}, ${client.nearestLocation}'),
                             SizedBox(height: 10),
-                            Text('Driver License:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+                            Text('رخصة القيادة:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
                             SizedBox(height: 5),
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8), // Rounded corners for the image
@@ -251,7 +251,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
                               ),
                             ),
                             SizedBox(height: 10),
-                            Text('ID Picture:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+                            Text('صورة الهوية:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
                             SizedBox(height: 5),
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8), // Rounded corners for the image
@@ -270,10 +270,10 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
                               ),
                             ),
                             SizedBox(height: 10),
-                            _buildDetailRow(Icons.payment, 'Payment Method: ${client.paymentMethod}'),
-                            _buildDetailRow(Icons.attach_money, 'Total Price: \$${client.totalPrice.toStringAsFixed(2)}'),
-                            _buildDetailRow(Icons.calendar_today, 'Rent Date: ${client.rentDate.toLocal()}'),
-                            _buildDetailRow(Icons.calendar_today, 'Return Date: ${client.returnDate.toLocal()}'),
+                            _buildDetailRow(Icons.payment, 'طريقة الدفع: ${client.paymentMethod}'),
+                            _buildDetailRow(Icons.attach_money, 'السعر الإجمالي: \$${client.totalPrice.toStringAsFixed(2)}'),
+                            _buildDetailRow(Icons.calendar_today, 'تاريخ الإيجار: ${client.rentDate.toLocal()}'),
+                            _buildDetailRow(Icons.calendar_today, 'تاريخ الإرجاع: ${client.returnDate.toLocal()}'),
                             SizedBox(height: 10),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -287,7 +287,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
                                       borderRadius: BorderRadius.circular(8), // Rounded corners for the button
                                     ),
                                   ),
-                                  child: Text('Approve', style: TextStyle(color: Colors.white)),
+                                  child: Text('موافقة', style: TextStyle(color: Colors.white)),
                                 ),
                                 SizedBox(width: 10), // Add spacing between buttons
                                 ElevatedButton(
@@ -299,7 +299,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
                                       borderRadius: BorderRadius.circular(8), // Rounded corners for the button
                                     ),
                                   ),
-                                  child: Text('Reject', style: TextStyle(color: Colors.white)),
+                                  child: Text('رفض', style: TextStyle(color: Colors.white)),
                                 ),
                               ],
                             ),

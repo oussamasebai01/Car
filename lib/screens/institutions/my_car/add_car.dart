@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../utils/config.dart';
 import 'car_liste.dart';
 
@@ -85,9 +83,8 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
     {'value': 'Carbon', 'label': 'Carbon', 'color': '#3a3a3a'},
   ];
 
-  // Extraire les labels de colorOptions et les convertir en majuscules
   final colors = colorOptions.map((option) {
-    final label = option['label'] ?? ''; // Valeur par défaut si null
+    final label = option['label'] ?? '';
     return label;
   }).toList();
   List<dynamic> manufactures = [];
@@ -155,8 +152,8 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
 
         return countriesFromServer.map((country) {
           return {
-            "id": country["id"], // ✅ On récupère l'ID
-            "name": country["name_en"] // ✅ Nom du pays en arabe
+            "id": country["id"],
+            "name": country["name_en"]
           };
         }).toList();
       } else {
@@ -187,7 +184,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
   }
 
   void setFields(Map<String, dynamic> car) {
-    final splitArray = car['tagNumber']?.split('-') ?? ['', '']; // Vérification de nullité
+    final splitArray = car['tagNumber']?.split('-') ?? ['', ''];
     setState(() {
       _formData['tagNumber1'] = splitArray[0];
       _formData['tagNumber2'] = splitArray[1];
@@ -274,7 +271,6 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
           ),
         );
       } else {
-        // Handle non-200 responses
         final errorResponse = json.decode(response.body);
         throw Exception(errorResponse['error'] ?? 'فشل في إرسال النموذج');
       }
@@ -288,6 +284,24 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
         isLoading = false;
       });
     }
+  }
+
+  bool _isFormValid() {
+    return _formData['manufacturer'].isNotEmpty &&
+        _formData['model'].isNotEmpty &&
+        _formData['tagNumber1'].isNotEmpty &&
+        _formData['tagNumber2'].isNotEmpty &&
+        _formData['manuYear'].isNotEmpty &&
+        _formData['pricePerDay'].isNotEmpty &&
+        _formData['pricePerWeek'].isNotEmpty &&
+        _formData['pricePerMonth'].isNotEmpty &&
+        _formData['pricePerYear'].isNotEmpty &&
+        _formData['gasType'].isNotEmpty &&
+        _formData['transmission'].isNotEmpty &&
+        _formData['seatNumber'].isNotEmpty &&
+        _formData['color'].isNotEmpty &&
+        selectedCountry != null &&
+        selectedCity != null;
   }
 
   @override
@@ -328,6 +342,12 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   labelText: 'الصانع',
                   border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null || (value as String).isEmpty) {
+                    return 'الرجاء اختيار الصانع';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
 
@@ -355,6 +375,12 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   labelText: 'الموديل',
                   border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null || (value as String).isEmpty) {
+                    return 'الرجاء اختيار الموديل';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
 
@@ -364,14 +390,23 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   Expanded(
                     child: TextFormField(
                       initialValue: _formData['tagNumber1'],
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'الجزء الأول من رقم اللوحة',
                         border: OutlineInputBorder(),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.red),
+                        ),
                       ),
                       onChanged: (value) {
                         setState(() {
                           _formData['tagNumber1'] = value;
                         });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'الرجاء إدخال الجزء الأول من رقم اللوحة';
+                        }
+                        return null;
                       },
                     ),
                   ),
@@ -379,14 +414,23 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   Expanded(
                     child: TextFormField(
                       initialValue: _formData['tagNumber2'],
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'الجزء الثاني من رقم اللوحة',
                         border: OutlineInputBorder(),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.red),
+                        ),
                       ),
                       onChanged: (value) {
                         setState(() {
                           _formData['tagNumber2'] = value;
                         });
+                      },
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'الرجاء إدخال الجزء الثاني من رقم اللوحة';
+                        }
+                        return null;
                       },
                     ),
                   ),
@@ -397,14 +441,23 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               // Manufacture Year
               TextFormField(
                 initialValue: _formData['manuYear'],
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'سنة التصنيع',
                   border: OutlineInputBorder(),
+                  errorBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
                 ),
                 onChanged: (value) {
                   setState(() {
                     _formData['manuYear'] = value;
                   });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'الرجاء إدخال سنة التصنيع';
+                  }
+                  return null;
                 },
               ),
               const SizedBox(height: 16),
@@ -412,14 +465,23 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               // Price Per Day
               TextFormField(
                 initialValue: _formData['pricePerDay'],
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'السعر اليومي',
                   border: OutlineInputBorder(),
+                  errorBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
                 ),
                 onChanged: (value) {
                   setState(() {
                     _formData['pricePerDay'] = value;
                   });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'الرجاء إدخال السعر اليومي';
+                  }
+                  return null;
                 },
               ),
               const SizedBox(height: 16),
@@ -427,14 +489,23 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               // Price Per Week
               TextFormField(
                 initialValue: _formData['pricePerWeek'],
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'السعر الأسبوعي',
                   border: OutlineInputBorder(),
+                  errorBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
                 ),
                 onChanged: (value) {
                   setState(() {
                     _formData['pricePerWeek'] = value;
                   });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'الرجاء إدخال السعر الأسبوعي';
+                  }
+                  return null;
                 },
               ),
               const SizedBox(height: 16),
@@ -442,14 +513,23 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               // Price Per Month
               TextFormField(
                 initialValue: _formData['pricePerMonth'],
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'السعر الشهري',
                   border: OutlineInputBorder(),
+                  errorBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
                 ),
                 onChanged: (value) {
                   setState(() {
                     _formData['pricePerMonth'] = value;
                   });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'الرجاء إدخال السعر الشهري';
+                  }
+                  return null;
                 },
               ),
               const SizedBox(height: 16),
@@ -457,14 +537,23 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               // Price Per Year
               TextFormField(
                 initialValue: _formData['pricePerYear'],
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'السعر السنوي',
                   border: OutlineInputBorder(),
+                  errorBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
                 ),
                 onChanged: (value) {
                   setState(() {
                     _formData['pricePerYear'] = value;
                   });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'الرجاء إدخال السعر السنوي';
+                  }
+                  return null;
                 },
               ),
               const SizedBox(height: 16),
@@ -487,6 +576,12 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   labelText: 'نوع الوقود',
                   border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null || (value as String).isEmpty) {
+                    return 'الرجاء اختيار نوع الوقود';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
 
@@ -508,6 +603,12 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   labelText: 'إلغاء مجاني',
                   border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null) {
+                    return 'الرجاء اختيار خيار الإلغاء';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
 
@@ -529,6 +630,12 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   labelText: 'مقعد أطفال',
                   border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null) {
+                    return 'الرجاء اختيار خيار مقعد الأطفال';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
 
@@ -550,20 +657,35 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   labelText: 'ناقل الحركة',
                   border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null || (value as String).isEmpty) {
+                    return 'الرجاء اختيار ناقل الحركة';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
 
               // Seat Number
               TextFormField(
                 initialValue: _formData['seatNumber'],
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'عدد المقاعد',
                   border: OutlineInputBorder(),
+                  errorBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Colors.red),
+                  ),
                 ),
                 onChanged: (value) {
                   setState(() {
                     _formData['seatNumber'] = value;
                   });
+                },
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'الرجاء إدخال عدد المقاعد';
+                  }
+                  return null;
                 },
               ),
               const SizedBox(height: 16),
@@ -605,6 +727,12 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                           });
                         },
                         decoration: InputDecoration(labelText: "اختر البلد"),
+                        validator: (value) {
+                          if (value == null) {
+                            return 'الرجاء اختيار البلد';
+                          }
+                          return null;
+                        },
                       );
                     },
                   ),
@@ -624,6 +752,12 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                         });
                       },
                       decoration: InputDecoration(labelText: "موقع الاستلام"),
+                      validator: (value) {
+                        if (value == null) {
+                          return 'الرجاء اختيار المدينة';
+                        }
+                        return null;
+                      },
                     ),
                 ],
               ),
@@ -692,6 +826,12 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   labelText: 'التوفر',
                   border: OutlineInputBorder(),
                 ),
+                validator: (value) {
+                  if (value == null) {
+                    return 'الرجاء اختيار التوفر';
+                  }
+                  return null;
+                },
               ),
               const SizedBox(height: 16),
 
@@ -699,21 +839,30 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               if (_formData['availability'] == 0)
                 TextFormField(
                   initialValue: _formData['reason'],
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     labelText: 'السبب',
                     border: OutlineInputBorder(),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.red),
+                    ),
                   ),
                   onChanged: (value) {
                     setState(() {
                       _formData['reason'] = value;
                     });
                   },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'الرجاء إدخال السبب';
+                    }
+                    return null;
+                  },
                 ),
               const SizedBox(height: 16),
 
               // Submit Button
               ElevatedButton(
-                onPressed: isLoading ? null : _submitForm,
+                onPressed: _isFormValid() && !isLoading ? _submitForm : null,
                 child: isLoading
                     ? const CircularProgressIndicator()
                     : Text(widget.isEdit ? 'تحديث' : 'إرسال'),

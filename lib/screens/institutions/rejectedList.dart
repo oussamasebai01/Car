@@ -27,7 +27,7 @@ class _RejectedScreenState extends State<RejectedScreen> {
     String? token = prefs.getString('auth_token'); // Replace 'auth_token' with your key
 
     if (token == null) {
-      throw Exception('User is not authenticated');
+      throw Exception('المستخدم غير مسجل الدخول');
     }
 
     final response = await http.get(
@@ -43,7 +43,7 @@ class _RejectedScreenState extends State<RejectedScreen> {
       List<Rejected> rejectedClients = body.map((dynamic item) => Rejected.fromJson(item)).toList();
       return rejectedClients;
     } else {
-      throw Exception('Failed to load rejected clients: ${response.statusCode}');
+      throw Exception('فشل في تحميل العملاء المرفوضين: ${response.statusCode}');
     }
   }
 
@@ -51,7 +51,7 @@ class _RejectedScreenState extends State<RejectedScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Rejected Booking Requests', style: TextStyle(color: Colors.white)),
+        title: Text('طلبات الحجز المرفوضة', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.green, // Green theme for the app bar
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white), // Custom back button
@@ -67,9 +67,9 @@ class _RejectedScreenState extends State<RejectedScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator(color: Colors.green));
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.red)));
+            return Center(child: Text('خطأ: ${snapshot.error}', style: TextStyle(color: Colors.red)));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No rejected clients found.', style: TextStyle(color: Colors.grey)));
+            return Center(child: Text('لا توجد عملاء مرفوضين.', style: TextStyle(color: Colors.grey)));
           } else {
             List<Rejected> rejectedClients = snapshot.data!;
             return ListView.builder(
@@ -90,7 +90,7 @@ class _RejectedScreenState extends State<RejectedScreen> {
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black, // Green text for the title
+                        color: Colors.black, // Black text for the title
                       ),
                     ),
                     leading: Icon(Icons.person, color: Colors.green), // Add an icon
@@ -106,12 +106,12 @@ class _RejectedScreenState extends State<RejectedScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildDetailRow(Icons.email, 'Email: ${rejected.email}'),
-                            _buildDetailRow(Icons.phone, 'Phone: ${rejected.phoneNumber}'),
-                            _buildDetailRow(Icons.phone_android, 'WhatsApp: ${rejected.whatsappNumber}'),
-                            _buildDetailRow(Icons.location_on, 'Address: ${rejected.street}, ${rejected.buildingNumber}, ${rejected.nearestLocation}'),
+                            _buildDetailRow(Icons.email, 'البريد الإلكتروني: ${rejected.email}'),
+                            _buildDetailRow(Icons.phone, 'الهاتف: ${rejected.phoneNumber}'),
+                            _buildDetailRow(Icons.phone_android, 'واتساب: ${rejected.whatsappNumber}'),
+                            _buildDetailRow(Icons.location_on, 'العنوان: ${rejected.street}, ${rejected.buildingNumber}, ${rejected.nearestLocation}'),
                             SizedBox(height: 10),
-                            Text('Driver License:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+                            Text('رخصة القيادة:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
                             SizedBox(height: 5),
                             if (rejected.driverLicense != null)
                               ClipRRect(
@@ -131,7 +131,7 @@ class _RejectedScreenState extends State<RejectedScreen> {
                                 ),
                               ),
                             SizedBox(height: 10),
-                            Text('ID Picture:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+                            Text('صورة الهوية:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
                             SizedBox(height: 5),
                             if (rejected.idPicture != null)
                               ClipRRect(
@@ -151,11 +151,11 @@ class _RejectedScreenState extends State<RejectedScreen> {
                                 ),
                               ),
                             SizedBox(height: 10),
-                            _buildDetailRow(Icons.payment, 'Payment Method: ${rejected.paymentMethod}'),
-                            _buildDetailRow(Icons.attach_money, 'Total Price: \$${rejected.totalPrice.toStringAsFixed(2)}'),
-                            _buildDetailRow(Icons.calendar_today, 'Rent Date: ${rejected.rentDate}'),
-                            _buildDetailRow(Icons.calendar_today, 'Return Date: ${rejected.returnDate}'),
-                            _buildDetailRow(Icons.description, 'Rejection Reason: ${rejected.description}'), // Added description
+                            _buildDetailRow(Icons.payment, 'طريقة الدفع: ${rejected.paymentMethod}'),
+                            _buildDetailRow(Icons.attach_money, 'السعر الإجمالي: \$${rejected.totalPrice.toStringAsFixed(2)}'),
+                            _buildDetailRow(Icons.calendar_today, 'تاريخ الإيجار: ${rejected.rentDate}'),
+                            _buildDetailRow(Icons.calendar_today, 'تاريخ الإرجاع: ${rejected.returnDate}'),
+                            _buildDetailRow(Icons.description, 'سبب الرفض: ${rejected.description}'), // Added description
                           ],
                         ),
                       ),
@@ -184,4 +184,3 @@ class _RejectedScreenState extends State<RejectedScreen> {
     );
   }
 }
-

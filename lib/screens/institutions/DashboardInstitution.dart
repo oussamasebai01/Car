@@ -8,12 +8,12 @@ import '../../utils/config.dart';
 class DashboardInstitution extends StatelessWidget {
   // List of card data (title, icon, and route)
   final List<Map<String, dynamic>> cards = [
-    {'title': 'My Cars', 'icon': FontAwesomeIcons.car, 'route': '/car_liste'},
-    {'title': 'Booking List', 'icon': FontAwesomeIcons.list, 'route': '/booking_list'},
-    {'title': 'Booking Requests', 'icon': FontAwesomeIcons.solidEnvelope, 'route': '/booking-request'},
-    {'title': 'Rejected List', 'icon': FontAwesomeIcons.timesCircle, 'route': '/rejected_list'},
-    {'title': 'Cancelled List', 'icon': FontAwesomeIcons.ban, 'route': '/cancelled_list'},
-    {'title': 'Finished Bookings', 'icon': FontAwesomeIcons.checkCircle, 'route': '/finished_bookings'},
+    {'title': 'سياراتي', 'icon': FontAwesomeIcons.car, 'route': '/car_liste'},
+    {'title': 'قائمة الحجوزات', 'icon': FontAwesomeIcons.list, 'route': '/booking_list'},
+    {'title': 'طلبات الحجز', 'icon': FontAwesomeIcons.solidEnvelope, 'route': '/booking-request'},
+    {'title': 'القائمة المرفوضة', 'icon': FontAwesomeIcons.timesCircle, 'route': '/rejected_list'},
+    {'title': 'القائمة الملغاة', 'icon': FontAwesomeIcons.ban, 'route': '/cancelled_list'},
+    {'title': 'الحجوزات المنتهية', 'icon': FontAwesomeIcons.checkCircle, 'route': '/finished_bookings'},
   ];
 
   Future<String?> getAuthToken() async {
@@ -41,7 +41,7 @@ class DashboardInstitution extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Institution Dashboard'),
+        title: Text('لوحة تحكم المؤسسة'),
         automaticallyImplyLeading: false,
         actions: [
           IconButton(
@@ -50,7 +50,7 @@ class DashboardInstitution extends StatelessWidget {
               Navigator.pushReplacementNamed(context, '/singin');
             },
             icon: Icon(FontAwesomeIcons.signOutAlt),
-            tooltip: 'Logout',
+            tooltip: 'تسجيل الخروج',
           ),
         ],
         centerTitle: true,

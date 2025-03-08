@@ -27,7 +27,7 @@ class _FinishedScreenState extends State<FinishedScreen> {
     String? token = prefs.getString('auth_token'); // Replace 'auth_token' with your key
 
     if (token == null) {
-      throw Exception('User is not authenticated');
+      throw Exception('المستخدم غير مسجل الدخول');
     }
 
     final response = await http.get(
@@ -49,7 +49,7 @@ class _FinishedScreenState extends State<FinishedScreen> {
       List<Finished> finishedClients = data.map((dynamic item) => Finished.fromJson(item)).toList();
       return finishedClients;
     } else {
-      throw Exception('Failed to load finished clients: ${response.statusCode}');
+      throw Exception('فشل في تحميل الحجوزات المنتهية: ${response.statusCode}');
     }
   }
 
@@ -57,7 +57,7 @@ class _FinishedScreenState extends State<FinishedScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Finished Bookings', style: TextStyle(color: Colors.white)),
+        title: Text('الحجوزات المنتهية', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.green, // Green theme for the app bar
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white), // Custom back button
@@ -73,9 +73,9 @@ class _FinishedScreenState extends State<FinishedScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator(color: Colors.green));
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}', style: TextStyle(color: Colors.red)));
+            return Center(child: Text('خطأ: ${snapshot.error}', style: TextStyle(color: Colors.red)));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No finished bookings found.', style: TextStyle(color: Colors.grey)));
+            return Center(child: Text('لا توجد حجوزات منتهية.', style: TextStyle(color: Colors.grey)));
           } else {
             List<Finished> finishedClients = snapshot.data!;
             return ListView.builder(
@@ -112,12 +112,12 @@ class _FinishedScreenState extends State<FinishedScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildDetailRow(Icons.email, 'Email: ${finished.email}'),
-                            _buildDetailRow(Icons.phone, 'Phone: ${finished.phoneNumber}'),
-                            _buildDetailRow(Icons.phone_android, 'WhatsApp: ${finished.whatsappNumber}'),
-                            _buildDetailRow(Icons.location_on, 'Address: ${finished.street}, ${finished.buildingNumber}, ${finished.nearestLocation}'),
+                            _buildDetailRow(Icons.email, 'البريد الإلكتروني: ${finished.email}'),
+                            _buildDetailRow(Icons.phone, 'الهاتف: ${finished.phoneNumber}'),
+                            _buildDetailRow(Icons.phone_android, 'واتساب: ${finished.whatsappNumber}'),
+                            _buildDetailRow(Icons.location_on, 'العنوان: ${finished.street}, ${finished.buildingNumber}, ${finished.nearestLocation}'),
                             SizedBox(height: 10),
-                            Text('Driver License:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+                            Text('رخصة القيادة:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
                             SizedBox(height: 5),
                             if (finished.driverLicense != null)
                               ClipRRect(
@@ -137,7 +137,7 @@ class _FinishedScreenState extends State<FinishedScreen> {
                                 ),
                               ),
                             SizedBox(height: 10),
-                            Text('ID Picture:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+                            Text('صورة الهوية:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
                             SizedBox(height: 5),
                             if (finished.idPicture != null)
                               ClipRRect(
@@ -157,11 +157,11 @@ class _FinishedScreenState extends State<FinishedScreen> {
                                 ),
                               ),
                             SizedBox(height: 10),
-                            _buildDetailRow(Icons.payment, 'Payment Method: ${finished.paymentMethod}'),
-                            _buildDetailRow(Icons.attach_money, 'Total Price: \$${finished.totalPrice.toStringAsFixed(2)}'),
-                            _buildDetailRow(Icons.calendar_today, 'Rent Date: ${finished.rentDate}'),
-                            _buildDetailRow(Icons.calendar_today, 'Return Date: ${finished.returnDate}'),
-                            _buildDetailRow(Icons.description, 'Description: ${finished.description}'), // Added description
+                            _buildDetailRow(Icons.payment, 'طريقة الدفع: ${finished.paymentMethod}'),
+                            _buildDetailRow(Icons.attach_money, 'السعر الإجمالي: \$${finished.totalPrice.toStringAsFixed(2)}'),
+                            _buildDetailRow(Icons.calendar_today, 'تاريخ الإيجار: ${finished.rentDate}'),
+                            _buildDetailRow(Icons.calendar_today, 'تاريخ الإرجاع: ${finished.returnDate}'),
+                            _buildDetailRow(Icons.description, 'الوصف: ${finished.description}'), // Added description
                           ],
                         ),
                       ),
