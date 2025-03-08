@@ -52,37 +52,37 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
   };
 
   static const colorOptions = [
-    { 'value': 'Red', 'label': 'Red', 'color': '#ff0000' },
-    { 'value': 'Blue', 'label': 'Blue', 'color': '#0000ff' },
-    { 'value': 'Black', 'label': 'Black', 'color': '#000000' },
-    { 'value': 'White', 'label': 'White', 'color': '#ffffff' },
-    { 'value': 'Silver', 'label': 'Silver', 'color': '#c0c0c0' },
-    { 'value': 'Green', 'label': 'Green', 'color': '#008000' },
-    { 'value': 'Yellow', 'label': 'Yellow', 'color': '#ffff00' },
-    { 'value': 'Orange', 'label': 'Orange', 'color': '#ffa500' },
-    { 'value': 'Pink', 'label': 'Pink', 'color': '#ffc0cb' },
-    { 'value': 'Purple', 'label': 'Purple', 'color': '#800080' },
-    { 'value': 'Brown', 'label': 'Brown', 'color': '#a52a2a' },
-    { 'value': 'Gray', 'label': 'Gray', 'color': '#808080' },
-    { 'value': 'Beige', 'label': 'Beige', 'color': '#f5f5dc' },
-    { 'value': 'Gold', 'label': 'Gold', 'color': '#ffd700' },
-    { 'value': 'Bronze', 'label': 'Bronze', 'color': '#cd7f32' },
-    { 'value': 'Turquoise', 'label': 'Turquoise', 'color': '#40e0d0' },
-    { 'value': 'Champagne', 'label': 'Champagne', 'color': '#f7e7ce' },
-    { 'value': 'Navy', 'label': 'Navy', 'color': '#000080' },
-    { 'value': 'Teal', 'label': 'Teal', 'color': '#008080' },
-    { 'value': 'Burgundy', 'label': 'Burgundy', 'color': '#800020' },
-    { 'value': 'Lavender', 'label': 'Lavender', 'color': '#e6e6fa' },
-    { 'value': 'Ivory', 'label': 'Ivory', 'color': '#fffff0' },
-    { 'value': 'Pearl', 'label': 'Pearl', 'color': '#f0e5de' },
-    { 'value': 'Mint', 'label': 'Mint', 'color': '#98ff98' },
-    { 'value': 'Copper', 'label': 'Copper', 'color': '#b87333' },
-    { 'value': 'Mahogany', 'label': 'Mahogany', 'color': '#c04000' },
-    { 'value': 'Platinum', 'label': 'Platinum', 'color': '#e5e4e2' },
-    { 'value': 'MatteBlack', 'label': 'Matte Black', 'color': '#212121' },
-    { 'value': 'MatteWhite', 'label': 'Matte White', 'color': '#f2f2f2' },
-    { 'value': 'MatteGray', 'label': 'Matte Gray', 'color': '#bdbdbd' },
-    { 'value': 'Carbon', 'label': 'Carbon', 'color': '#3a3a3a' },
+    {'value': 'Red', 'label': 'Red', 'color': '#ff0000'},
+    {'value': 'Blue', 'label': 'Blue', 'color': '#0000ff'},
+    {'value': 'Black', 'label': 'Black', 'color': '#000000'},
+    {'value': 'White', 'label': 'White', 'color': '#ffffff'},
+    {'value': 'Silver', 'label': 'Silver', 'color': '#c0c0c0'},
+    {'value': 'Green', 'label': 'Green', 'color': '#008000'},
+    {'value': 'Yellow', 'label': 'Yellow', 'color': '#ffff00'},
+    {'value': 'Orange', 'label': 'Orange', 'color': '#ffa500'},
+    {'value': 'Pink', 'label': 'Pink', 'color': '#ffc0cb'},
+    {'value': 'Purple', 'label': 'Purple', 'color': '#800080'},
+    {'value': 'Brown', 'label': 'Brown', 'color': '#a52a2a'},
+    {'value': 'Gray', 'label': 'Gray', 'color': '#808080'},
+    {'value': 'Beige', 'label': 'Beige', 'color': '#f5f5dc'},
+    {'value': 'Gold', 'label': 'Gold', 'color': '#ffd700'},
+    {'value': 'Bronze', 'label': 'Bronze', 'color': '#cd7f32'},
+    {'value': 'Turquoise', 'label': 'Turquoise', 'color': '#40e0d0'},
+    {'value': 'Champagne', 'label': 'Champagne', 'color': '#f7e7ce'},
+    {'value': 'Navy', 'label': 'Navy', 'color': '#000080'},
+    {'value': 'Teal', 'label': 'Teal', 'color': '#008080'},
+    {'value': 'Burgundy', 'label': 'Burgundy', 'color': '#800020'},
+    {'value': 'Lavender', 'label': 'Lavender', 'color': '#e6e6fa'},
+    {'value': 'Ivory', 'label': 'Ivory', 'color': '#fffff0'},
+    {'value': 'Pearl', 'label': 'Pearl', 'color': '#f0e5de'},
+    {'value': 'Mint', 'label': 'Mint', 'color': '#98ff98'},
+    {'value': 'Copper', 'label': 'Copper', 'color': '#b87333'},
+    {'value': 'Mahogany', 'label': 'Mahogany', 'color': '#c04000'},
+    {'value': 'Platinum', 'label': 'Platinum', 'color': '#e5e4e2'},
+    {'value': 'MatteBlack', 'label': 'Matte Black', 'color': '#212121'},
+    {'value': 'MatteWhite', 'label': 'Matte White', 'color': '#f2f2f2'},
+    {'value': 'MatteGray', 'label': 'Matte Gray', 'color': '#bdbdbd'},
+    {'value': 'Carbon', 'label': 'Carbon', 'color': '#3a3a3a'},
   ];
 
   // Extraire les labels de colorOptions et les convertir en majuscules
@@ -145,10 +145,10 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
       print('Error fetching models: $e');
     }
   }
+
   Future<List<Map<String, dynamic>>> fetchCountries() async {
     try {
-      final response = await http.get(
-          Uri.parse('${Config.BASE_URL}/countries'));
+      final response = await http.get(Uri.parse('${Config.BASE_URL}/countries'));
 
       if (response.statusCode == 200) {
         List<dynamic> countriesFromServer = json.decode(response.body);
@@ -171,13 +171,11 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
 
   Future<List<String>> fetchCities(int countryId) async {
     try {
-      final response = await http.get(
-          Uri.parse("${Config.BASE_URL}/countries/$countryId/cities"));
+      final response = await http.get(Uri.parse("${Config.BASE_URL}/countries/$countryId/cities"));
 
       if (response.statusCode == 200) {
         List<dynamic> citiesFromServer = json.decode(response.body);
-        return citiesFromServer.map((city) => city["name_en"].toString())
-            .toList();
+        return citiesFromServer.map((city) => city["name_en"].toString()).toList();
       } else {
         print("Erreur serveur: ${response.statusCode}");
         return [];
@@ -191,8 +189,6 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
   void setFields(Map<String, dynamic> car) {
     final splitArray = car['tagNumber']?.split('-') ?? ['', '']; // Vérification de nullité
     setState(() {
-      // _formData['manufacturer'] = car['model']?['manufacture']?? '';
-      // _formData['model'] = car['model']?['id'] ?? '';
       _formData['tagNumber1'] = splitArray[0];
       _formData['tagNumber2'] = splitArray[1];
       _formData['manuYear'] = car['manu_year'] ?? '';
@@ -269,7 +265,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
 
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(widget.isEdit ? 'Car updated successfully!' : 'Car added successfully!')),
+          SnackBar(content: Text(widget.isEdit ? 'تم تحديث السيارة بنجاح!' : 'تمت إضافة السيارة بنجاح!')),
         );
         Navigator.push(
           context,
@@ -280,12 +276,12 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
       } else {
         // Handle non-200 responses
         final errorResponse = json.decode(response.body);
-        throw Exception(errorResponse['error'] ?? 'Failed to submit form');
+        throw Exception(errorResponse['error'] ?? 'فشل في إرسال النموذج');
       }
     } catch (e) {
       print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(content: Text('خطأ: $e')),
       );
     } finally {
       setState(() {
@@ -298,7 +294,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isEdit ? 'Edit Car' : 'Add Car'),
+        title: Text(widget.isEdit ? 'تعديل السيارة' : 'إضافة سيارة'),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -312,7 +308,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                 items: [
                   DropdownMenuItem(
                     value: null,
-                    child: Text('Select Manufacturer'),
+                    child: Text('اختر الصانع'),
                   ),
                   ...manufactures.map((manufacture) {
                     return DropdownMenuItem(
@@ -329,7 +325,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   fetchModels(value.toString());
                 },
                 decoration: const InputDecoration(
-                  labelText: 'Manufacturer',
+                  labelText: 'الصانع',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -341,7 +337,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                 items: [
                   DropdownMenuItem(
                     value: null,
-                    child: Text('Select Model'),
+                    child: Text('اختر الموديل'),
                   ),
                   ...models.map((model) {
                     return DropdownMenuItem(
@@ -356,7 +352,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   });
                 },
                 decoration: const InputDecoration(
-                  labelText: 'Model',
+                  labelText: 'الموديل',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -369,7 +365,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                     child: TextFormField(
                       initialValue: _formData['tagNumber1'],
                       decoration: const InputDecoration(
-                        labelText: 'Tag Number Part 1',
+                        labelText: 'الجزء الأول من رقم اللوحة',
                         border: OutlineInputBorder(),
                       ),
                       onChanged: (value) {
@@ -384,7 +380,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                     child: TextFormField(
                       initialValue: _formData['tagNumber2'],
                       decoration: const InputDecoration(
-                        labelText: 'Tag Number Part 2',
+                        labelText: 'الجزء الثاني من رقم اللوحة',
                         border: OutlineInputBorder(),
                       ),
                       onChanged: (value) {
@@ -402,7 +398,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               TextFormField(
                 initialValue: _formData['manuYear'],
                 decoration: const InputDecoration(
-                  labelText: 'Manufacture Year',
+                  labelText: 'سنة التصنيع',
                   border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
@@ -417,7 +413,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               TextFormField(
                 initialValue: _formData['pricePerDay'],
                 decoration: const InputDecoration(
-                  labelText: 'Price Per Day',
+                  labelText: 'السعر اليومي',
                   border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
@@ -432,7 +428,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               TextFormField(
                 initialValue: _formData['pricePerWeek'],
                 decoration: const InputDecoration(
-                  labelText: 'Price Per Week',
+                  labelText: 'السعر الأسبوعي',
                   border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
@@ -447,7 +443,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               TextFormField(
                 initialValue: _formData['pricePerMonth'],
                 decoration: const InputDecoration(
-                  labelText: 'Price Per Month',
+                  labelText: 'السعر الشهري',
                   border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
@@ -462,7 +458,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               TextFormField(
                 initialValue: _formData['pricePerYear'],
                 decoration: const InputDecoration(
-                  labelText: 'Price Per Year',
+                  labelText: 'السعر السنوي',
                   border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
@@ -488,7 +484,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   });
                 },
                 decoration: const InputDecoration(
-                  labelText: 'Gas Type',
+                  labelText: 'نوع الوقود',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -500,7 +496,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                 items: [true, false].map((value) {
                   return DropdownMenuItem(
                     value: value,
-                    child: Text(value ? 'Yes' : 'No'),
+                    child: Text(value ? 'نعم' : 'لا'),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -509,7 +505,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   });
                 },
                 decoration: const InputDecoration(
-                  labelText: 'Free Cancellation',
+                  labelText: 'إلغاء مجاني',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -521,7 +517,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                 items: [true, false].map((value) {
                   return DropdownMenuItem(
                     value: value,
-                    child: Text(value ? 'Yes' : 'No'),
+                    child: Text(value ? 'نعم' : 'لا'),
                   );
                 }).toList(),
                 onChanged: (value) {
@@ -530,7 +526,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   });
                 },
                 decoration: const InputDecoration(
-                  labelText: 'Baby Seat',
+                  labelText: 'مقعد أطفال',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -551,7 +547,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   });
                 },
                 decoration: const InputDecoration(
-                  labelText: 'Transmission',
+                  labelText: 'ناقل الحركة',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -561,7 +557,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               TextFormField(
                 initialValue: _formData['seatNumber'],
                 decoration: const InputDecoration(
-                  labelText: 'Seat Number',
+                  labelText: 'عدد المقاعد',
                   border: OutlineInputBorder(),
                 ),
                 onChanged: (value) {
@@ -573,105 +569,74 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
               const SizedBox(height: 16),
 
               Column(
-                  children: [
-                    FutureBuilder<List<Map<String, dynamic>>>(
-                      future: fetchCountries(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text("Erreur de chargement des pays");
-                        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                          return Text("Aucun pays disponible");
-                        }
+                children: [
+                  FutureBuilder<List<Map<String, dynamic>>>(
+                    future: fetchCountries(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text("خطأ في تحميل البلدان");
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Text("لا توجد بلدان متاحة");
+                      }
 
-                        List<Map<String, dynamic>> countries = snapshot.data!;
+                      List<Map<String, dynamic>> countries = snapshot.data!;
 
-                        return DropdownButtonFormField<int>(
-                          value: selectedCountryId, // ✅ Utilise l'ID du pays comme valeur sélectionnée
-                          items: countries.map((country) {
-                            return DropdownMenuItem<int>(
-                              value: country["id"], // ✅ Utilisation de l'ID du pays
-                              child: Text(country["name"]), // ✅ Affichage du nom du pays
-                            );
-                          }).toList(),
-                          onChanged: (value) async {
-                            setState(() {
-                              selectedCountryId = value; // ✅ Stocke l'ID du pays sélectionné
-                              selectedCountry = countries.firstWhere((country) => country["id"] == value)["name"]; // ✅ Stocke le nom du pays
-                              selectedCity = null;
-                              cities = [];
-                            });
-
-                            // ✅ Charger les villes du pays sélectionné
-                            List<String> fetchedCities = await fetchCities(value!);
-                            setState(() {
-                              cities = fetchedCities;
-                            });
-                          },
-                          decoration: InputDecoration(labelText: "اختر البلد"),
-                        );
-                      },
-                    ),
-
-                    if (cities.isNotEmpty)
-                      DropdownButtonFormField<String>(
-                        value: selectedCity,
-                        items: cities.map((String city) {
-                          return DropdownMenuItem<String>(
-                            value: city,
-                            child: Text(city),
+                      return DropdownButtonFormField<int>(
+                        value: selectedCountryId,
+                        items: countries.map((country) {
+                          return DropdownMenuItem<int>(
+                            value: country["id"],
+                            child: Text(country["name"]),
                           );
                         }).toList(),
-                        onChanged: (value) {
+                        onChanged: (value) async {
                           setState(() {
-                            selectedCity = value;
+                            selectedCountryId = value;
+                            selectedCountry = countries.firstWhere((country) => country["id"] == value)["name"];
+                            selectedCity = null;
+                            cities = [];
+                          });
+
+                          List<String> fetchedCities = await fetchCities(value!);
+                          setState(() {
+                            cities = fetchedCities;
                           });
                         },
-                        decoration: InputDecoration(labelText: "موقع الاستلام"),
-                      ),
+                        decoration: InputDecoration(labelText: "اختر البلد"),
+                      );
+                    },
+                  ),
 
-                  ]
+                  if (cities.isNotEmpty)
+                    DropdownButtonFormField<String>(
+                      value: selectedCity,
+                      items: cities.map((String city) {
+                        return DropdownMenuItem<String>(
+                          value: city,
+                          child: Text(city),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedCity = value;
+                        });
+                      },
+                      decoration: InputDecoration(labelText: "موقع الاستلام"),
+                    ),
+                ],
               ),
               const SizedBox(height: 16),
 
-              // City Dropdown
-              // DropdownButtonFormField(
-              //   value: _formData['city'],
-              //   items: [
-              //     DropdownMenuItem(
-              //       value: null,
-              //       child: Text('Select City'),
-              //     ),
-              //     ...cities.map((city) {
-              //       return DropdownMenuItem(
-              //         value: city,
-              //         child: Text(city),
-              //       );
-              //     }).toList(),
-              //   ],
-              //   onChanged: (value) {
-              //     setState(() {
-              //       _formData['city'] = value ?? '';
-              //     });
-              //   },
-              //   decoration: const InputDecoration(
-              //     labelText: 'City',
-              //     border: OutlineInputBorder(),
-              //   ),
-              // ),
-              const SizedBox(height: 16),
-
               DropdownButtonFormField<String>(
-                value: _formData['color']?.isEmpty ?? true ? null : _formData['color'], // Vérification null-safe
+                value: _formData['color']?.isEmpty ?? true ? null : _formData['color'],
                 items: colors.map((String color) {
-                  // Trouver l'objet color correspondant dans colorOptions
                   final colorOption = colorOptions.firstWhere(
                         (option) => option['label'] == color,
-                    orElse: () => { 'label': 'UNKNOWN', 'color': '#000000' }, // Ajout de 'label'
+                    orElse: () => {'label': 'UNKNOWN', 'color': '#000000'},
                   );
 
-                  // Vérifier que colorOption['color'] n'est pas null
                   final colorHex = (colorOption['color'] ?? '#000000') as String;
                   final colorValue = colorHex.replaceAll('#', '0xFF');
 
@@ -695,43 +660,28 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                 }).toList(),
                 onChanged: (value) {
                   setState(() {
-                    _formData['color'] = value ?? ''; // Assurez-vous que la valeur n'est pas null
+                    _formData['color'] = value ?? '';
                   });
                 },
                 decoration: const InputDecoration(
-                  labelText: 'Color',
+                  labelText: 'اللون',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please select a color';
+                    return 'الرجاء اختيار لون';
                   }
                   return null;
                 },
               ),
-              //Color
-              // TextFormField(
-              //   initialValue: _formData['color'],
-              //   decoration: const InputDecoration(
-              //     labelText: 'Color',
-              //     border: OutlineInputBorder(),
-              //   ),
-              //   onChanged: (value) {
-              //     setState(() {
-              //       _formData['color'] = value;
-              //     });
-              //   },
-              // ),
-
-
               const SizedBox(height: 16),
 
               // Availability
               DropdownButtonFormField(
                 value: _formData['availability'],
                 items: [
-                  DropdownMenuItem(value: 1, child: Text('Available')),
-                  DropdownMenuItem(value: 0, child: Text('Not Available')),
+                  DropdownMenuItem(value: 1, child: Text('متاح')),
+                  DropdownMenuItem(value: 0, child: Text('غير متاح')),
                 ],
                 onChanged: (value) {
                   setState(() {
@@ -739,7 +689,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                   });
                 },
                 decoration: const InputDecoration(
-                  labelText: 'Availability',
+                  labelText: 'التوفر',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -750,7 +700,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                 TextFormField(
                   initialValue: _formData['reason'],
                   decoration: const InputDecoration(
-                    labelText: 'Reason',
+                    labelText: 'السبب',
                     border: OutlineInputBorder(),
                   ),
                   onChanged: (value) {
@@ -766,7 +716,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
                 onPressed: isLoading ? null : _submitForm,
                 child: isLoading
                     ? const CircularProgressIndicator()
-                    : Text(widget.isEdit ? 'Update' : 'Submit'),
+                    : Text(widget.isEdit ? 'تحديث' : 'إرسال'),
               ),
             ],
           ),
