@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:car/models/car_model.dart';
+import 'package:car/utils/config.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,7 +26,7 @@ Future<List<CarModel>> fetchCars() async {
   final token = await getAuthToken();
   print(token);
   final response = await http.get(
-    Uri.parse('http://10.0.2.2:8000/api/cars-inst'),
+    Uri.parse('${Config.BASE_URL}/cars-inst'),
     headers: {
       'Authorization': 'Bearer $token',
     },
@@ -119,7 +120,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
       try {
         // Envoyer une requête DELETE à l'API
         final response = await http.delete(
-          Uri.parse('http://10.0.2.2:8000/api/delete-institution-cars/${car.id}'),
+          Uri.parse('${Config.BASE_URL}/delete-institution-cars/${car.id}'),
           headers: {
             'Authorization': 'Bearer $token',
           },

@@ -244,7 +244,7 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
         'description_availability': _formData['availability'] == 0 ? _formData['reason'] : '',
       };
 
-      // print('iddddddd :${widget.tempCar!['id']}');
+      print('Payload: $payload');
 
       final response = widget.isEdit
           ? await http.post(
@@ -264,7 +264,9 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
         },
       );
 
-      print(payload);
+      print('Response status code: ${response.statusCode}');
+      print('Response body: ${response.body}');
+
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(widget.isEdit ? 'Car updated successfully!' : 'Car added successfully!')),
@@ -276,11 +278,12 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
           ),
         );
       } else {
+        // Handle non-200 responses
         final errorResponse = json.decode(response.body);
         throw Exception(errorResponse['error'] ?? 'Failed to submit form');
       }
     } catch (e) {
-      print(e);
+      print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );

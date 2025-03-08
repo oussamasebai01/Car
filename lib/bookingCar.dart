@@ -189,7 +189,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         color: Colors.white,
         child: ElevatedButton(
           onPressed:() {
-            _submitForm ; // Appeler _submitForm ici
+            _submitForm() ; // Appeler _submitForm ici
         Navigator.push(
         context,
         MaterialPageRoute(
