@@ -4,7 +4,8 @@ import 'dart:convert';
 import 'package:car/utils/config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../dashboard_client.dart'; // Import SharedPreferences
+import '../../dashboard_client.dart'; // استيراد SharedPreferences
+
 class SignInScreen extends StatefulWidget {
   const SignInScreen({Key? key}) : super(key: key);
 
@@ -15,7 +16,7 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _isLoading = false; // To show a loading indicator
+  bool _isLoading = false; // لإظهار مؤشر التحميل
 
   @override
   void dispose() {
@@ -24,79 +25,77 @@ class _SignInScreenState extends State<SignInScreen> {
     super.dispose();
   }
 
-  // Function to call the login API
+  // دالة لاستدعاء واجهة تسجيل الدخول
   Future<void> _login() async {
     setState(() {
-      _isLoading = true; // Show loading indicator
+      _isLoading = true; // إظهار مؤشر التحميل
     });
 
-    // API endpoint
-   const String apiUrl = '${Config.BASE_URL}/login';
+    // عنوان واجهة تسجيل الدخول
+    const String apiUrl = '${Config.BASE_URL}/login';
 
-    // Prepare the request body
+    // إعداد بيانات الطلب
     final Map<String, String> requestBody = {
       'email': _emailController.text,
       'password': _passwordController.text,
     };
-print(requestBody);
+    print(requestBody);
 
     try {
-      // Send POST request to the API
+      // إرسال طلب POST إلى الواجهة
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(requestBody),
       );
-print (response.headers);
-      // Check the response status code
+      print(response.headers);
+
+      // التحقق من رمز حالة الاستجابة
       if (response.statusCode == 200) {
-
-
-        // Successful login
+        // تسجيل الدخول ناجح
         final Map<String, dynamic> responseData = json.decode(response.body);
-        print('Login successful: $responseData');
-        // Extract the token from the response
-        final String token = responseData['access_token']; // Assurez-vous que la clé est correcte
+        print('تم تسجيل الدخول بنجاح: $responseData');
+        // استخراج الرمز من الاستجابة
+        final String token = responseData['access_token']; // تأكد من أن المفتاح صحيح
 
-        // Save the token to SharedPreferences
+        // حفظ الرمز في SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
         print(token);
 
-        // Navigate to the home screen or perform other actions
-       // Navigator.pushNamed(context, '/HomeScreen');
+        // الانتقال إلى الشاشة الرئيسية أو تنفيذ إجراءات أخرى
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Login success'),
+            content: Text('تم تسجيل الدخول بنجاح'),
             backgroundColor: Colors.green,
           ),
         );
         Navigator.pushNamed(context, '/dashboardinstitution');
       } else {
-        // Handle errors
+        // التعامل مع الأخطاء
         final Map<String, dynamic> errorData = json.decode(response.body);
-        print('Login failed: ${errorData['message']}');
+        print('فشل تسجيل الدخول: ${errorData['message']}');
 
-        // Show error message to the user
+        // عرض رسالة الخطأ للمستخدم
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Login failed: ${errorData['message']}'),
+            content: Text('فشل تسجيل الدخول: ${errorData['message']}'),
             backgroundColor: Colors.red,
           ),
         );
       }
     } catch (e) {
-      // Handle network or server errors
-      print('Error: $e');
+      // التعامل مع أخطاء الشبكة أو الخادم
+      print('خطأ: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('An error occurred. Please try again later.'),
+          content: Text('حدث خطأ. يرجى المحاولة مرة أخرى لاحقًا.'),
           backgroundColor: Colors.red,
         ),
       );
     } finally {
       setState(() {
-        _isLoading = false; // Hide loading indicator
+        _isLoading = false; // إخفاء مؤشر التحميل
       });
     }
   }
@@ -108,17 +107,17 @@ print (response.headers);
       appBar: AppBar(
         centerTitle: true,
         title: const Text(
-          "Sign In",
+          "تسجيل الدخول",
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: const IconThemeData(color: Colors.black),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back), // Icône de retour
+          icon: const Icon(Icons.arrow_back), // زر الرجوع
           onPressed: () {
-            // Navigation vers l'écran précédent
+            // الانتقال إلى الشاشة السابقة
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -133,20 +132,20 @@ print (response.headers);
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             children: [
-              // App Logo at the Middle Top
+              // شعار التطبيق في الأعلى
               const SizedBox(height: 40),
               Center(
                 child: Image.asset(
-                  'assets/logo.png', // Replace with your app logo path
+                  'assets/logo.png', // استبدل بمسار شعار التطبيق
                   height: 100,
                   width: 100,
                 ),
               ),
               const SizedBox(height: 40),
 
-              // Email Field
+              // حقل البريد الإلكتروني
               const Text(
-                "Email",
+                "البريد الإلكتروني",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -157,7 +156,7 @@ print (response.headers);
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  hintText: "Enter your email",
+                  hintText: "أدخل بريدك الإلكتروني",
                   prefixIcon: const Icon(Icons.email, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -166,9 +165,9 @@ print (response.headers);
               ),
               const SizedBox(height: 20),
 
-              // Password Field
+              // حقل كلمة المرور
               const Text(
-                "Password",
+                "كلمة المرور",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -179,7 +178,7 @@ print (response.headers);
                 controller: _passwordController,
                 obscureText: true,
                 decoration: InputDecoration(
-                  hintText: "Enter your password",
+                  hintText: "أدخل كلمة المرور",
                   prefixIcon: const Icon(Icons.lock, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
@@ -188,16 +187,16 @@ print (response.headers);
               ),
               const SizedBox(height: 10),
 
-              // Forgot Password
+              // نسيت كلمة المرور
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
                   onPressed: () {
-                    // Navigate to Forgot Password Screen
+                    // الانتقال إلى شاشة نسيت كلمة المرور
                     Navigator.pushNamed(context, '/forgetpassword');
                   },
                   child: const Text(
-                    "Forgot Password?",
+                    "نسيت كلمة المرور؟",
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.blue,
@@ -208,11 +207,11 @@ print (response.headers);
               ),
               const SizedBox(height: 20),
 
-              // Sign-In Button
+              // زر تسجيل الدخول
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _login, // Disable button when loading
+                  onPressed: _isLoading ? null : _login, // تعطيل الزر أثناء التحميل
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     shape: RoundedRectangleBorder(
@@ -220,9 +219,9 @@ print (response.headers);
                     ),
                   ),
                   child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white) // Show loading indicator
+                      ? const CircularProgressIndicator(color: Colors.white) // إظهار مؤشر التحميل
                       : const Text(
-                    "Sign In",
+                    "تسجيل الدخول",
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -240,7 +239,7 @@ print (response.headers);
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              "Don't have an account?",
+              "ليس لديك حساب؟",
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey,
@@ -249,11 +248,11 @@ print (response.headers);
             const SizedBox(width: 5),
             GestureDetector(
               onTap: () {
-                // Navigate to SignUpScreen
+                // الانتقال إلى شاشة التسجيل
                 Navigator.pushNamed(context, '/SignUpScreen');
               },
               child: const Text(
-                "Sign Up",
+                "إنشاء حساب",
                 style: TextStyle(
                   fontSize: 14,
                   color: Colors.green,

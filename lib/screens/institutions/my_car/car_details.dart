@@ -10,65 +10,63 @@ class CarDetailsPageI extends StatelessWidget {
 
   CarDetailsPageI({required this.car});
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(car.modelName!), // Utiliser car.modelName comme titre
-        backgroundColor: Colors.green, // AppBar noire pour un style moderne
-        elevation: 0, // Supprimer l'ombre
+        title: Text(car.modelName!), // استخدام car.modelName كعنوان
+        backgroundColor: Colors.green, // لون خلفية AppBar
+        elevation: 0, // إزالة الظل
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image par défaut
+            // صورة افتراضية
             ClipRRect(
-              borderRadius: BorderRadius.circular(12), // Bordure arrondie
+              borderRadius: BorderRadius.circular(12), // حواف مدورة
               child: Image.asset(
-                "assets/bmw_x5.png", // Image par défaut
+                "assets/bmw_x5.png", // صورة افتراضية
                 fit: BoxFit.cover,
                 width: double.infinity,
-                height: 200, // Hauteur de l'image
+                height: 200, // ارتفاع الصورة
               ),
             ),
             SizedBox(height: 16),
 
-            // Prix total et prix par jour
+            // السعر الإجمالي والسعر اليومي
             Row(
               children: [
-
-                Spacer(), // Pousse le deuxième texte à l'extrême droite
+                Spacer(), // دفع النص الثاني إلى أقصى اليمين
                 Text(
-                  '\$${car.pricePerDay}/day', // Prix par jour
+                  '\$${car.pricePerDay}/يوم', // السعر اليومي
                   style: TextStyle(fontSize: 16, color: Colors.grey),
                 ),
               ],
             ),
             SizedBox(height: 16),
 
-            // Informations de base
+            // المعلومات الأساسية
             Text(
-              'Fabricant : ${car.manufacturerName}',
+              'الصانع: ${car.manufacturerName}',
               style: TextStyle(fontSize: 16, color: Colors.black),
             ),
             SizedBox(height: 8),
             Text(
-              'Ville : ${car.city}',
+              'المدينة: ${car.city}',
               style: TextStyle(fontSize: 16, color: Colors.black),
             ),
             SizedBox(height: 8),
             Text(
-              'Institution : ${car.institutionName}',
+              'المؤسسة: ${car.institutionName}',
               style: TextStyle(fontSize: 16, color: Colors.black),
             ),
             SizedBox(height: 16),
 
-            // Spécifications techniques
+            // المواصفات الفنية
             Text(
-              'Spécifications',
+              'المواصفات',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 8),
@@ -78,18 +76,17 @@ class CarDetailsPageI extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Sièges', style: TextStyle(color: Colors.grey)),
+                      Text('المقاعد', style: TextStyle(color: Colors.grey)),
                       Row(
                         children: [
                           Icon(
-                            Icons.people_alt ,
+                            Icons.people_alt,
                             size: 24,
                             color: Colors.green,
                           ),
                           Text('  ${car.seatNumber}', style: TextStyle(fontSize: 16)),
                         ],
                       ),
-
                     ],
                   ),
                 ),
@@ -97,18 +94,17 @@ class CarDetailsPageI extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Carburant', style: TextStyle(color: Colors.grey)),
+                      Text('نوع الوقود', style: TextStyle(color: Colors.grey)),
                       Row(
                         children: [
                           Icon(
-                            Icons.local_gas_station ,
+                            Icons.local_gas_station,
                             size: 24,
                             color: Colors.green,
                           ),
-                          Text(" "+car.gazType!, style: TextStyle(fontSize: 16)),
+                          Text(" " + car.gazType!, style: TextStyle(fontSize: 16)),
                         ],
                       ),
-
                     ],
                   ),
                 ),
@@ -116,18 +112,17 @@ class CarDetailsPageI extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Couleur', style: TextStyle(color: Colors.grey)),
+                      Text('اللون', style: TextStyle(color: Colors.grey)),
                       Row(
                         children: [
                           Icon(
-                            Icons.color_lens ,
+                            Icons.color_lens,
                             size: 24,
                             color: Colors.green,
                           ),
-                          Text("  "+car.carColor!, style: TextStyle(fontSize: 16)),
+                          Text("  " + car.carColor!, style: TextStyle(fontSize: 16)),
                         ],
                       ),
-
                     ],
                   ),
                 ),
@@ -135,11 +130,11 @@ class CarDetailsPageI extends StatelessWidget {
             ),
             SizedBox(height: 16),
 
-            // Transmission
+            // ناقل الحركة
             Row(
               children: [
                 Icon(
-                  Icons.tune ,
+                  Icons.tune,
                   size: 24,
                   color: Colors.green,
                 ),
@@ -152,22 +147,23 @@ class CarDetailsPageI extends StatelessWidget {
 
             SizedBox(height: 16),
 
-            Row(children: [
-              Icon(
-                Icons.tag ,
-                size: 24,
-                color: Colors.green,
-              ),
-              Text(
-                '  : ${car.tagNumber}',
-                style: TextStyle(fontSize: 16, color: Colors.black),
-              ),
-            ],),
-            // Tag
+            Row(
+              children: [
+                Icon(
+                  Icons.tag,
+                  size: 24,
+                  color: Colors.green,
+                ),
+                Text(
+                  '  : ${car.tagNumber}',
+                  style: TextStyle(fontSize: 16, color: Colors.black),
+                ),
+              ],
+            ),
 
             SizedBox(height: 16),
 
-            // Bouton "Book Now"
+            // زر "تحديث المعلومات"
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -175,7 +171,7 @@ class CarDetailsPageI extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AddInstitutionCarScreen(isEdit:true , tempCar: car.toJson()),
+                      builder: (context) => AddInstitutionCarScreen(isEdit: true, tempCar: car.toJson()),
                     ),
                   );
                 },
@@ -184,10 +180,10 @@ class CarDetailsPageI extends StatelessWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  backgroundColor: Colors.green, // Bouton noir
+                  backgroundColor: Colors.green, // لون الزر
                 ),
                 child: Text(
-                  "Update information",
+                  "تحديث المعلومات",
                   style: TextStyle(color: Colors.white, fontSize: 16),
                 ),
               ),

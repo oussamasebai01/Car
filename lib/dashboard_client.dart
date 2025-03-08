@@ -9,6 +9,7 @@ class CarSearchPage extends StatefulWidget {
   @override
   _CarSearchPageState createState() => _CarSearchPageState();
 }
+
 class _CarSearchPageState extends State<CarSearchPage> {
   String? selectedCountry;
   String? selectedCity;
@@ -19,6 +20,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
   int numberOfDays = 0;
 
   late Future<List<Map<String, dynamic>>> fetchedCountries;
+
   Future<DateTime?> showDateTimePicker() async {
     return await showDatePicker(
       context: context,
@@ -44,34 +46,34 @@ class _CarSearchPageState extends State<CarSearchPage> {
       return null;
     });
   }
+
   Future<List<Map<String, dynamic>>> fetchCountries() async {
     try {
-      final response = await http.get(
-          Uri.parse('${Config.BASE_URL}/countries'));
+      final response = await http.get(Uri.parse('${Config.BASE_URL}/countries'));
 
       if (response.statusCode == 200) {
         List<dynamic> countriesFromServer = json.decode(response.body);
 
         return countriesFromServer.map((country) {
           return {
-            "id": country["id"], // ✅ On récupère l'ID
-            "name": country["name_en"] // ✅ Nom du pays en arabe
+            "id": country["id"], // ✅ يتم استرجاع الـ ID
+            "name": country["name_en"] // ✅ اسم البلد بالعربية
           };
         }).toList();
       } else {
-        print("Erreur serveur: ${response.statusCode}");
+        print("خطأ في الخادم: ${response.statusCode}");
         return [];
       }
     } catch (e) {
-      print("Erreur lors de la récupération des pays: $e");
+      print("حدث خطأ أثناء جلب البلدان: $e");
       return [];
     }
   }
-////////////////////////////////////////////////////////////////////////////////////////////
+
   Future<void> searchCars() async {
     if (selectedCity == null || _pickupDateController.text.isEmpty || _returnDateController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Veuillez sélectionner une ville et des dates valides.")),
+        SnackBar(content: Text("الرجاء تحديد مدينة وتواريخ صالحة.")),
       );
       return;
     }
@@ -84,7 +86,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
     });
 
     try {
-      print("try");
+      print("جاري المحاولة");
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -96,57 +98,49 @@ class _CarSearchPageState extends State<CarSearchPage> {
         print(responseData);
         setState(() {
           cars = (responseData['data'] as List)
-              .map((carJson) => CarModel.fromJson(carJson)) // Use the updated fromJson method
+              .map((carJson) => CarModel.fromJson(carJson)) // استخدام طريقة fromJson المحدثة
               .toList();
           print(cars);
-          print("Parsed Car: ${CarModel.fromJson(responseData['data'][0])}");
-
+          print("تم تحليل السيارة: ${CarModel.fromJson(responseData['data'][0])}");
         });
       } else {
-        throw Exception('Failed to load cars: ${response.statusCode}');
+        throw Exception('فشل في تحميل السيارات: ${response.statusCode}');
       }
     } catch (e) {
-      print("error : $e");
+      print("خطأ: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Erreur lors de la recherche de voitures: $e")),
+        SnackBar(content: Text("حدث خطأ أثناء البحث عن السيارات: $e")),
       );
     }
   }
-  /////////////////////////////////////////////////////////////////////////////////////////////////////
+
   Future<List<String>> fetchCities(int countryId) async {
     try {
-      final response = await http.get(
-          Uri.parse("${Config.BASE_URL}/countries/$countryId/cities"));
+      final response = await http.get(Uri.parse("${Config.BASE_URL}/countries/$countryId/cities"));
 
       if (response.statusCode == 200) {
         List<dynamic> citiesFromServer = json.decode(response.body);
-        return citiesFromServer.map((city) => city["name_en"].toString())
-            .toList();
+        return citiesFromServer.map((city) => city["name_en"].toString()).toList();
       } else {
-        print("Erreur serveur: ${response.statusCode}");
+        print("خطأ في الخادم: ${response.statusCode}");
         return [];
       }
     } catch (e) {
-      print("Erreur lors de la récupération des villes: $e");
+      print("حدث خطأ أثناء جلب المدن: $e");
       return [];
     }
   }
 
   void calculateDaysDifference() {
-    if (_pickupDateController.text.isNotEmpty &&
-        _returnDateController.text.isNotEmpty) {
+    if (_pickupDateController.text.isNotEmpty && _returnDateController.text.isNotEmpty) {
       DateTime pickupDate = DateTime.parse(_pickupDateController.text);
       DateTime returnDate = DateTime.parse(_returnDateController.text);
 
       setState(() {
-        numberOfDays = returnDate
-            .difference(pickupDate)
-            .inDays;
+        numberOfDays = returnDate.difference(pickupDate).inDays;
       });
     }
   }
-
-
 
   @override
   void initState() {
@@ -186,29 +180,29 @@ class _CarSearchPageState extends State<CarSearchPage> {
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             return CircularProgressIndicator();
                           } else if (snapshot.hasError) {
-                            return Text("Erreur de chargement des pays");
+                            return Text("خطأ في تحميل البلدان");
                           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return Text("Aucun pays disponible");
+                            return Text("لا توجد بلدان متاحة");
                           }
 
                           List<Map<String, dynamic>> countries = snapshot.data!;
 
-                          return DropdownButtonFormField<int>( // ✅ Maintenant, on stocke un `int` (l'ID du pays)
+                          return DropdownButtonFormField<int>( // ✅ الآن يتم تخزين `int` (معرف البلد)
                             value: selectedCountry != null ? int.tryParse(selectedCountry!) : null,
                             items: countries.map((country) {
                               return DropdownMenuItem<int>(
-                                value: country["id"], // ✅ Utilisation de l'ID réel du pays
-                                child: Text(country["name"]), // ✅ Affichage du nom du pays
+                                value: country["id"], // ✅ استخدام الـ ID الفعلي للبلد
+                                child: Text(country["name"]), // ✅ عرض اسم البلد
                               );
                             }).toList(),
                             onChanged: (value) async {
                               setState(() {
-                                selectedCountry = value.toString(); // ✅ Stocker l'ID du pays sélectionné sous forme de String
+                                selectedCountry = value.toString(); // ✅ تخزين معرف البلد المحدد كـ String
                                 selectedCity = null;
                                 cities = [];
                               });
 
-                              // ✅ Charger les villes du pays sélectionné
+                              // ✅ جلب مدن البلد المحدد
                               List<String> fetchedCities = await fetchCities(value!);
                               setState(() {
                                 cities = fetchedCities;
@@ -235,7 +229,6 @@ class _CarSearchPageState extends State<CarSearchPage> {
                           },
                           decoration: InputDecoration(labelText: "موقع الاستلام"),
                         ),
-
 
                       TextField(
                         controller: _pickupDateController,
@@ -267,8 +260,8 @@ class _CarSearchPageState extends State<CarSearchPage> {
                       ),
                       SizedBox(height: 16),
                       ElevatedButton(
-                        onPressed: searchCars,////////////////////////////////////////
-                        child: Text("بحث "),
+                        onPressed: searchCars,
+                        child: Text("بحث"),
                         style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
                       )
                     ],
@@ -292,7 +285,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => CarDetailsPage(car: cars[index],date_debut:_pickupDateController.text,date_fin:_returnDateController.text,  numberOfDays: numberOfDays),
+                          builder: (context) => CarDetailsPage(car: cars[index], date_debut: _pickupDateController.text, date_fin: _returnDateController.text, numberOfDays: numberOfDays),
                         ),
                       );
                     },

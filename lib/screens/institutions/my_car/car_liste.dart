@@ -55,7 +55,7 @@ Future<List<CarModel>> fetchCars() async {
       );
     }).toList();
   } else {
-    throw Exception('Failed to load data');
+    throw Exception('فشل في تحميل البيانات');
   }
 }
 
@@ -92,25 +92,25 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
     });
   }
 
-  // Fonction pour supprimer une réservation via l'API
+  // دالة لحذف حجز عبر API
   Future<void> deleteBooking(int index) async {
     final car = filteredBookings[index];
     final token = await getAuthToken();
 
-    // Boîte de dialogue de confirmation
+    // مربع حوار التأكيد
     final confirmed = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Confirm Delete'),
-        content: Text('Are you sure you want to delete ${car.modelName}?'),
+        title: const Text('تأكيد الحذف'),
+        content: Text('هل أنت متأكد أنك تريد حذف ${car.modelName}؟'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: const Text('إلغاء'),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: const Text('حذف', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
@@ -118,7 +118,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
 
     if (confirmed == true) {
       try {
-        // Envoyer une requête DELETE à l'API
+        // إرسال طلب DELETE إلى API
         final response = await http.delete(
           Uri.parse('${Config.BASE_URL}/delete-institution-cars/${car.id}'),
           headers: {
@@ -127,30 +127,30 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
         );
 
         if (response.statusCode == 200) {
-          // Supprimer l'élément de la liste locale
+          // حذف العنصر من القائمة المحلية
           setState(() {
             filteredBookings.removeAt(index);
           });
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${car.modelName} deleted successfully'),
+              content: Text('تم حذف ${car.modelName} بنجاح'),
               backgroundColor: Colors.green,
             ),
           );
         } else {
-          // Gérer les erreurs de l'API
+          // التعامل مع أخطاء API
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to delete ${car.modelName}: ${response.body}'),
+              content: Text('فشل في حذف ${car.modelName}: ${response.body}'),
               backgroundColor: Colors.red,
             ),
           );
         }
       } catch (e) {
-        // Gérer les erreurs de connexion
+        // التعامل مع أخطاء الاتصال
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: ${e.toString()}'),
+            content: Text('خطأ: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -162,15 +162,15 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Booking', style: TextStyle(color: Colors.white)),
+        title: const Text('قائمة سياراتي', style: TextStyle(color: Colors.white)),
         centerTitle: true,
         backgroundColor: Colors.green,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back), // Icône de retour
+          icon: const Icon(Icons.arrow_back), // زر الرجوع
           onPressed: () {
-            // Navigation vers l'écran précédent
+            // الانتقال إلى الشاشة السابقة
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -182,13 +182,13 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
       ),
       body: Column(
         children: [
-          // Barre de recherche
+          // شريط البحث
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: TextField(
               controller: searchController,
               decoration: InputDecoration(
-                hintText: 'Search cars...',
+                hintText: 'ابحث عن سيارات...',
                 prefixIcon: const Icon(Icons.search, color: Colors.blueGrey),
                 filled: true,
                 fillColor: Colors.grey[200],
@@ -201,7 +201,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
               onChanged: filterBookings,
             ),
           ),
-          // Liste des réservations
+          // قائمة الحجوزات
           Expanded(
             child: FutureBuilder<List<CarModel>>(
               future: futureCars,
@@ -209,7 +209,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
+                  return Center(child: Text('خطأ: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                   return emptyBooking();
                 } else {
@@ -220,18 +220,18 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
           ),
         ],
       ),
-      // Bouton flottant
+      // زر الإضافة العائم
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => AddInstitutionCarScreen(isEdit:false , tempCar :null),
+              builder: (context) => AddInstitutionCarScreen(isEdit: false, tempCar: null),
             ),
           );
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Floating Action Button clicked!'),
+              content: Text('تم النقر على زر الإضافة العائم!'),
             ),
           );
         },
@@ -309,7 +309,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Tag Number: ${car.tagNumber}',
+                              'رقم اللوحة: ${car.tagNumber}',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey[600],
@@ -346,7 +346,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Color',
+                              'اللون',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey[600],
@@ -368,7 +368,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Manufacturer',
+                              'الصانع',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey[600],
@@ -390,7 +390,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Price/Day',
+                              'السعر/اليوم',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey[600],
@@ -429,7 +429,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
           ),
           const SizedBox(height: 16),
           const Text(
-            'No bookings yet',
+            'لا توجد حجوزات حتى الآن',
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
