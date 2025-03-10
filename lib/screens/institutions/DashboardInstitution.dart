@@ -14,6 +14,7 @@ class DashboardInstitution extends StatelessWidget {
     {'title': 'القائمة المرفوضة', 'icon': FontAwesomeIcons.timesCircle, 'route': '/rejected_list'},
     {'title': 'القائمة الملغاة', 'icon': FontAwesomeIcons.ban, 'route': '/cancelled_list'},
     {'title': 'الحجوزات المنتهية', 'icon': FontAwesomeIcons.checkCircle, 'route': '/finished_bookings'},
+    {'title': 'الملف الشخصي', 'icon': FontAwesomeIcons.user, 'route': '/profile'},
   ];
 
   Future<String?> getAuthToken() async {
@@ -116,7 +117,7 @@ class DashboardInstitution extends StatelessWidget {
         child: InkWell(
           onTap: () {
             // Navigate to the specific route
-            Navigator.pushReplacementNamed(context, route).then((_) {
+            Navigator.pushNamed(context, route).then((_) {
               print('$title clicked');
             }).catchError((error) {
               print('Navigation error: $error');

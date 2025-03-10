@@ -6,6 +6,7 @@ import 'package:car/screens/institutions/BookingList.dart';
 import 'package:car/screens/institutions/CanceledList.dart';
 import 'package:car/screens/institutions/DashboardInstitution.dart';
 import 'package:car/screens/institutions/FinishedList.dart';
+import 'package:car/screens/institutions/Profile.dart';
 import 'package:car/screens/institutions/bookingRequest.dart';
 import 'package:car/screens/institutions/my_car/car_liste.dart';
 import 'package:car/screens/institutions/rejectedList.dart';
@@ -82,6 +83,10 @@ class MyApp extends StatelessWidget {
             "/booking_list": (context) {
               // Replace with your actual cancelled_list screen widget
               return BookingListScreen ();
+            },
+            "/profile": (context) {
+              // Replace with your actual cancelled_list screen widget
+              return ProfileScreen ();
             },
           },
         );
