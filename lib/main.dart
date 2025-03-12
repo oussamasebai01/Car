@@ -120,7 +120,7 @@ class NotificationService {
   late IO.Socket socket;
 
   void initSocket() {
-    socket = IO.io('http://192.168.147.227:3000', <String, dynamic>{
+    socket = IO.io('http://10.0.2.2:3000', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': true,
     });
