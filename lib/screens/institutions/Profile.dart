@@ -113,7 +113,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  ///////////////////////////////_uploadLogo(File imageFile)/////////////////////////////////////
   Future<void> _uploadLogo() async {
     if (_logoImage == null) {
       setState(() {
@@ -137,28 +136,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       print('Attaching file: ${_logoImage!.path}');
       var request = http.MultipartRequest('POST', Uri.parse(url));
-        request.headers['Authorization'] = 'Bearer $token';
+      request.headers['Authorization'] = 'Bearer $token';
 
-        request.files.add(await http.MultipartFile.fromPath('logo_image', _logoImage!.path));
+      request.files.add(await http.MultipartFile.fromPath('logo_image', _logoImage!.path));
 
       print('Sending request...');
       var response = await request.send();
       print('Response status: ${response.statusCode}');
 
-     // final responseData = await response.stream.bytesToString();
-     // print('Raw response body: $responseData'); // Log the raw response
-
       if (response.statusCode == 200) {
         try {
-          // Attempt to decode the response as JSON
-          // final jsonResponse = json.decode(responseData);
-          // print('Decoded JSON response: $jsonResponse');
-
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('تم تحديث الشعار بنجاح')),
           );
 
-          // Refresh institution data after successful upload
           await _fetchInstitutionData();
         } catch (e) {
           setState(() {
@@ -214,107 +205,121 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildProfileHeader() {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Color(0xFFFAFAFA), // Very light gray background
+    return Card(
+      elevation: 8, // Add elevation for shadow
+      margin: EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Column(
-        children: [
-          SizedBox(
-            width: 200,
-            height: 200,
-            child: Stack(
-              alignment: Alignment.bottomRight,
-              children: [
-                Center(
-                  child: _logoImage != null
-                      ? Image.file(
-                    _logoImage!,
-                    width: 200,
-                    height: 200,
-                    fit: BoxFit.contain, // Don't crop
-                  )
-                      : (institutionData != null &&
-                      institutionData!['logo_image'] != null &&
-                      institutionData!['logo_image'].toString().isNotEmpty)
-                      ? Image.network(
-                    institutionData!['logo_image'],
-                    width: 200,
-                    height: 200,
-                    fit: BoxFit.contain, // Don't crop
-                  )
-                      : Container(
-                    width: 200,
-                    height: 200,
-                    color: Colors.transparent, // Empty space
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Color(0xFFFAFAFA), // Very light gray background
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          children: [
+            SizedBox(
+              width: 200,
+              height: 200,
+              child: Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  Center(
+                    child: _logoImage != null
+                        ? Image.file(
+                      _logoImage!,
+                      width: 200,
+                      height: 200,
+                      fit: BoxFit.contain, // Don't crop
+                    )
+                        : (institutionData != null &&
+                        institutionData!['logo_image'] != null &&
+                        institutionData!['logo_image'].toString().isNotEmpty)
+                        ? Image.network(
+                      institutionData!['logo_image'],
+                      width: 200,
+                      height: 200,
+                      fit: BoxFit.contain, // Don't crop
+                    )
+                        : Container(
+                      width: 200,
+                      height: 200,
+                      color: Colors.transparent, // Empty space
+                    ),
                   ),
-                ),
-                GestureDetector(
-                  onTap: _pickImage, // Trigger image picker on tap
-                  child: Icon(
-                    Icons.camera_alt,
-                    size: 28, // Bigger icon
-                    color: Colors.green,
+                  GestureDetector(
+                    onTap: _pickImage, // Trigger image picker on tap
+                    child: Icon(
+                      Icons.camera_alt,
+                      size: 28, // Bigger icon
+                      color: Colors.green,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(height: 20),
-          Text(
-            institutionData?['name'] ?? 'اسم المؤسسة',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-          ),
-          SizedBox(height: 5),
-          Text(
-            institutionData?['institution_number'] ?? 'رقم المؤسسة',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.black54,
-            ),
-          ),
-          SizedBox(height: 20),
-          // Add a button to upload the selected image
-          if (_logoImage != null)
-            ElevatedButton(
-              onPressed: _uploadLogo, // Trigger upload on press
-              child: Text('رفع الصورة'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                ],
               ),
             ),
-        ],
+            SizedBox(height: 20),
+            Text(
+              institutionData?['name'] ?? 'اسم المؤسسة',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+            ),
+            SizedBox(height: 5),
+            Text(
+              institutionData?['institution_number'] ?? 'رقم المؤسسة',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+              ),
+            ),
+            SizedBox(height: 20),
+            // Add a button to upload the selected image
+            if (_logoImage != null)
+              ElevatedButton(
+                onPressed: _uploadLogo, // Trigger upload on press
+                child: Text('رفع الصورة'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }
 
   // Method to build institution information section
   Widget _buildInstitutionInfo() {
-    return Padding(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'معلومات المؤسسة',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+    return Card(
+      elevation: 8, // Add elevation for shadow
+      margin: EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'معلومات المؤسسة',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(height: 10),
-          _buildInfoRow('العنوان', institutionData?['address_en'] ?? 'غير متوفر'),
-          _buildInfoRow('رقم الطوارئ', institutionData?['emergency_number'] ?? 'غير متوفر'),
-          _buildInfoRow('الرصيد', '\$${institutionData?['balance'] ?? '0'}'),
-          _buildInfoRow('عدد السيارات', '${institutionData?['institution_cars']?.length ?? '0'}'),
-        ],
+            SizedBox(height: 10),
+            _buildInfoRow('العنوان', institutionData?['address_en'] ?? 'غير متوفر'),
+            _buildInfoRow('رقم الطوارئ', institutionData?['emergency_number'] ?? 'غير متوفر'),
+            _buildInfoRow('عدد السيارات', '${institutionData?['institution_cars']?.length ?? '0'}'),
+          ],
+        ),
       ),
     );
   }
@@ -345,71 +350,85 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   // Method to build the users section
   Widget _buildUsersSection() {
-    return Padding(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'المستخدمين',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+    return Card(
+      elevation: 8, // Add elevation for shadow
+      margin: EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'المستخدم',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(height: 10),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: institutionData?['users']?.length ?? 0,
-            itemBuilder: (context, index) {
-              var user = institutionData?['users'][index];
-              return ListTile(
-                leading: CircleAvatar(
-                  child: Icon(Icons.person),
-                ),
-                title: Text(user['name'] ?? 'غير متوفر'),
-                subtitle: Text(user['email'] ?? 'غير متوفر'),
-              );
-            },
-          ),
-        ],
+            SizedBox(height: 10),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: institutionData?['users']?.length ?? 0,
+              itemBuilder: (context, index) {
+                var user = institutionData?['users'][index];
+                return ListTile(
+                  leading: CircleAvatar(
+                    child: Icon(Icons.person),
+                  ),
+                  title: Text(user['name'] ?? 'غير متوفر'),
+                  subtitle: Text(user['email'] ?? 'غير متوفر'),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 
   // Method to build the reviews section
   Widget _buildReviewsSection() {
-    return Padding(
-      padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'التقييمات',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+    return Card(
+      elevation: 8, // Add elevation for shadow
+      margin: EdgeInsets.all(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'التقييمات',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          SizedBox(height: 10),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: NeverScrollableScrollPhysics(),
-            itemCount: institutionData?['institution_reviews']?.length ?? 0,
-            itemBuilder: (context, index) {
-              var review = institutionData?['institution_reviews'][index];
-              return Card(
-                margin: EdgeInsets.symmetric(vertical: 5),
-                child: ListTile(
-                  leading: Icon(Icons.star, color: Colors.amber),
-                  title: Text('التقييم: ${review['rating'] ?? 'غير متوفر'}'),
-                  subtitle: Text(review['comment'] ?? 'لا يوجد تعليق'),
-                ),
-              );
-            },
-          ),
-        ],
+            SizedBox(height: 10),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: institutionData?['institution_reviews']?.length ?? 0,
+              itemBuilder: (context, index) {
+                var review = institutionData?['institution_reviews'][index];
+                return Card(
+                  margin: EdgeInsets.symmetric(vertical: 5),
+                  child: ListTile(
+                    leading: Icon(Icons.star, color: Colors.amber),
+                    title: Text('التقييم: ${review['rating'] ?? 'غير متوفر'}'),
+                    subtitle: Text(review['comment'] ?? 'لا يوجد تعليق'),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
