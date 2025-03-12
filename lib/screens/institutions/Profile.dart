@@ -97,15 +97,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
+      final file = File(pickedFile.path);
+      final fileSize = await file.length(); // File size in bytes
+
+      if (fileSize > 2 * 1024 * 1024) { // Limit of 2 MB
+        setState(() {
+          errorMessage = 'حجم الصورة كبير جدًا. الحد الأقصى هو 2 ميجابايت.';
+        });
+        return;
+      }
+
       setState(() {
-        _logoImage = File(pickedFile.path); // Store the selected image file
+        _logoImage = file;
       });
-      await _uploadLogo(_logoImage!); // Upload the image
     }
   }
 
-  // Function to upload the logo to the API
-  Future<void> _uploadLogo(File imageFile) async {
+  ///////////////////////////////_uploadLogo(File imageFile)/////////////////////////////////////
+  Future<void> _uploadLogo() async {
+    if (_logoImage == null) {
+      setState(() {
+        errorMessage = 'لم يتم اختيار صورة.';
+      });
+      return;
+    }
+
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
 
@@ -119,41 +135,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final url = '${Config.BASE_URL}/logo-institution';
 
     try {
-      var request = http.MultipartRequest('POST', Uri.parse(url))
-        ..headers['Authorization'] = 'Bearer $token'
-        ..files.add(await http.MultipartFile.fromPath('logo_image', imageFile.path));
+      print('Attaching file: ${_logoImage!.path}');
+      var request = http.MultipartRequest('POST', Uri.parse(url));
+        request.headers['Authorization'] = 'Bearer $token';
 
+        request.files.add(await http.MultipartFile.fromPath('logo_image', _logoImage!.path));
+
+      print('Sending request...');
       var response = await request.send();
-      print('Response status: ${response.statusCode}'); // Log the status code
+      print('Response status: ${response.statusCode}');
+
+     // final responseData = await response.stream.bytesToString();
+     // print('Raw response body: $responseData'); // Log the raw response
 
       if (response.statusCode == 200) {
-        final responseData = await response.stream.bytesToString();
-        print('Response body: $responseData'); // Log the response body
-
         try {
-          final jsonResponse = json.decode(responseData);
-          setState(() {
-            institutionData?['logo_image'] = jsonResponse['logo_image_url']; // Update the logo URL
-          });
+          // Attempt to decode the response as JSON
+          // final jsonResponse = json.decode(responseData);
+          // print('Decoded JSON response: $jsonResponse');
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('تم تحديث الشعار بنجاح')),
           );
+
+          // Refresh institution data after successful upload
+          await _fetchInstitutionData();
         } catch (e) {
           setState(() {
-            errorMessage = 'فشل في تحليل الاستجابة من الخادم: $e';
+            errorMessage = 'فشل في تحليل البيانات: $e';
           });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('فشل في تحليل البيانات: $e')),
+          );
         }
       } else {
-        final responseData = await response.stream.bytesToString();
-        print('Error response body: $responseData'); // Log the error response body
         setState(() {
-          errorMessage = 'فشل في تحميل الشعار. يرجى المحاولة مرة أخرى لاحقًا.';
+          errorMessage = 'حدث خطأ: ${response.statusCode}';
         });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('حدث خطأ: ${response.statusCode}')),
+        );
       }
     } catch (e) {
       setState(() {
         errorMessage = 'حدث خطأ: $e';
       });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('حدث خطأ: $e')),
+      );
     }
   }
 
@@ -201,7 +230,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               children: [
                 Center(
                   child: _logoImage != null
-                  // Case when user picked an image locally
                       ? Image.file(
                     _logoImage!,
                     width: 200,
@@ -211,18 +239,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       : (institutionData != null &&
                       institutionData!['logo_image'] != null &&
                       institutionData!['logo_image'].toString().isNotEmpty)
-                  // Case when image from API exists
                       ? Image.network(
                     institutionData!['logo_image'],
                     width: 200,
                     height: 200,
                     fit: BoxFit.contain, // Don't crop
                   )
-                  // Case when no image at all
                       : Container(
                     width: 200,
                     height: 200,
-                    color: Colors.transparent, // Empty space, can add placeholder color if needed
+                    color: Colors.transparent, // Empty space
                   ),
                 ),
                 GestureDetector(
@@ -253,6 +279,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
               color: Colors.black54,
             ),
           ),
+          SizedBox(height: 20),
+          // Add a button to upload the selected image
+          if (_logoImage != null)
+            ElevatedButton(
+              onPressed: _uploadLogo, // Trigger upload on press
+              child: Text('رفع الصورة'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              ),
+            ),
         ],
       ),
     );

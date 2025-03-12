@@ -12,15 +12,50 @@ import 'package:car/screens/institutions/my_car/car_liste.dart';
 import 'package:car/screens/institutions/rejectedList.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'dashboard_client.dart';
 import 'on_bording_screen.dart';
 import 'splash_screen.dart';
-void main() {
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeNotifications(); // Initialiser les notifications
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+Future<void> initializeNotifications() async {
+  await AwesomeNotifications().initialize(
+    null, // Chemin de l'icône (laisser null pour utiliser l'icône par défaut)
+    [
+      NotificationChannel(
+        channelKey: 'basic_channel',
+        channelName: 'Basic Notifications',
+        channelDescription: 'Channel for basic notifications',
+        importance: NotificationImportance.High,
+        defaultColor: Colors.blue,
+        ledColor: Colors.white,
+      ),
+    ],
+  );
+}
+
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final NotificationService _notificationService = NotificationService();
+
+  @override
+  void initState() {
+    super.initState();
+    _notificationService.initSocket(); // Initialiser le socket
+    requestNotificationPermission(); // Demander la permission pour les notifications
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,63 +65,49 @@ class MyApp extends StatelessWidget {
           title: 'GO Cars',
           routes: {
             "/": (context) {
-              return SplashScreen();
+              return SplashScreen(); // Remplacer la NotificationScreen
             },
             "/OnBordingScreen": (context) {
-              // Replace with your actual onboarding screen widget
               return OnBordingScreen();
             },
             "/DashboardClient": (context) {
-              // Replace with your actual onboarding screen widget
               return CarSearchPage();
             },
             "/singin": (context) {
-              // Replace with your actual singin screen widget
               return SignInScreen();
             },
             "/verifyotp": (context) {
-              // Replace with your actual OtpScreen screen widget
-              return OtpScreen (email: '',);
+              return OtpScreen(email: '');
             },
             "/forgetpassword": (context) {
-              // Replace with your actual Forgot Password screen widget
-              return ForgotPasswordScreen ();
+              return ForgotPasswordScreen();
             },
             "/SignUpScreen": (context) {
-              // Replace with your actual Forgot Password screen widget
-              return RegisterInstitutionScreen ();
+              return RegisterInstitutionScreen();
             },
             "/dashboardinstitution": (context) {
-              // Replace with your actual Dashboard Institution screen widget
-              return DashboardInstitution ();
+              return DashboardInstitution();
             },
             "/car_liste": (context) {
-              // Replace with your actual Dashboard Institution screen widget
-              return MyBookingScreen ();
+              return MyBookingScreen();
             },
             "/booking-request": (context) {
-              // Replace with your actual Booking Request screen widget
-              return BookingRequestScreen ();
+              return BookingRequestScreen();
             },
             "/rejected_list": (context) {
-              // Replace with your actual rejected screen widget
-              return RejectedScreen ();
+              return RejectedScreen();
             },
             "/finished_bookings": (context) {
-              // Replace with your actual finished_bookings screen widget
-              return FinishedScreen ();
+              return FinishedScreen();
             },
             "/cancelled_list": (context) {
-              // Replace with your actual cancelled_list screen widget
-              return CanceledListScreen ();
+              return CanceledListScreen();
             },
             "/booking_list": (context) {
-              // Replace with your actual cancelled_list screen widget
-              return BookingListScreen ();
+              return BookingListScreen();
             },
             "/profile": (context) {
-              // Replace with your actual cancelled_list screen widget
-              return ProfileScreen ();
+              return ProfileScreen();
             },
           },
         );
@@ -95,4 +116,53 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Placeholder for the OnBordingScreen widget
+class NotificationService {
+  late IO.Socket socket;
+
+  void initSocket() {
+    socket = IO.io('http://192.168.147.227:3000', <String, dynamic>{
+      'transports': ['websocket'],
+      'autoConnect': true,
+    });
+
+    // Écouter les notifications générales
+    socket.on('notification', (data) {
+      print('Notification received: $data');
+      showNotification('Notification', data); // Afficher la notification
+    });
+
+    // Écouter l'événement "welcome" et afficher une notification
+    socket.on('welcome', (data) {
+      print('Welcome message received: $data');
+      showNotification('Bienvenue', data); // Afficher la notification
+    });
+
+    // Écouter la connexion
+    socket.onConnect((_) {
+      print('Connected to Socket.IO server');
+    });
+
+    // Écouter la déconnexion
+    socket.onDisconnect((_) {
+      print('Disconnected from Socket.IO server');
+    });
+  }
+
+  void showNotification(String title, String message) async {
+    await AwesomeNotifications().createNotification(
+      content: NotificationContent(
+        id: DateTime.now().millisecondsSinceEpoch.remainder(100000), // ID unique
+        channelKey: 'basic_channel',
+        title: title,
+        body: message,
+      ),
+    );
+  }
+}
+
+void requestNotificationPermission() async {
+  bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
+  if (!isAllowed) {
+    await AwesomeNotifications().requestPermissionToSendNotifications();
+  }
+}
