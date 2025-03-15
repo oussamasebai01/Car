@@ -36,7 +36,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
     // إعداد بيانات الطلب
     final Map<String, String> requestBody = {
-      'email': _emailController.text,
+      'phone_number': _emailController.text,
       'password': _passwordController.text,
     };
     print(requestBody);
@@ -56,11 +56,14 @@ class _SignInScreenState extends State<SignInScreen> {
         final Map<String, dynamic> responseData = json.decode(response.body);
         print('تم تسجيل الدخول بنجاح: $responseData');
         // استخراج الرمز من الاستجابة
-        final String token = responseData['access_token']; // تأكد من أن المفتاح صحيح
+        final String token = responseData['access_token'];
+        final int _id = responseData['user']['id'];
 
         // حفظ الرمز في SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
+        await prefs.setInt('id', _id);
+        print('id dans prefs: $_id');
         print(token);
 
         // الانتقال إلى الشاشة الرئيسية أو تنفيذ إجراءات أخرى
@@ -156,7 +159,7 @@ class _SignInScreenState extends State<SignInScreen> {
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  hintText: "أدخل بريدك الإلكتروني",
+                  hintText: "رقم الهاتف",
                   prefixIcon: const Icon(Icons.email, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),

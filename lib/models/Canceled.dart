@@ -16,7 +16,6 @@ class Canceled {
   final String driverLicense;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final String idPicture;
   final String paymentMethod;
   final double totalPrice;
   final DateTime rentDate;
@@ -41,7 +40,6 @@ class Canceled {
     required this.driverLicense,
     required this.createdAt,
     required this.updatedAt,
-    required this.idPicture,
     required this.paymentMethod,
     required this.totalPrice,
     required this.rentDate,
@@ -68,7 +66,6 @@ class Canceled {
       driverLicense: json['driver_license'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
-      idPicture: json['id_picture'],
       paymentMethod: json['payment_method'],
       totalPrice: double.parse(json['total_price']),
       rentDate: DateTime.parse(json['rent_date']),

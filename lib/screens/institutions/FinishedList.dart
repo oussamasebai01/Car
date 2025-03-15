@@ -137,26 +137,6 @@ class _FinishedScreenState extends State<FinishedScreen> {
                                 ),
                               ),
                             SizedBox(height: 10),
-                            Text('صورة الهوية:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
-                            SizedBox(height: 5),
-                            if (finished.idPicture != null)
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8), // Rounded corners for the image
-                                child: Image.network(
-                                  finished.idPicture,
-                                  width: double.infinity,
-                                  height: 150,
-                                  fit: BoxFit.cover,
-                                  loadingBuilder: (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Center(child: CircularProgressIndicator(color: Colors.green));
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Center(child: Icon(Icons.error, color: Colors.red));
-                                  },
-                                ),
-                              ),
-                            SizedBox(height: 10),
                             _buildDetailRow(Icons.payment, 'طريقة الدفع: ${finished.paymentMethod}'),
                             _buildDetailRow(Icons.attach_money, 'السعر الإجمالي: \$${finished.totalPrice.toStringAsFixed(2)}'),
                             _buildDetailRow(Icons.calendar_today, 'تاريخ الإيجار: ${finished.rentDate}'),

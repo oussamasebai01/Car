@@ -15,7 +15,6 @@ class Booking {
   final String driverLicense;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final String? idPicture;
   final String paymentMethod;
   final double totalPrice;
   final DateTime rentDate;
@@ -38,7 +37,6 @@ class Booking {
     required this.driverLicense,
     required this.createdAt,
     required this.updatedAt,
-    this.idPicture,
     required this.paymentMethod,
     required this.totalPrice,
     required this.rentDate,
@@ -63,7 +61,6 @@ class Booking {
       driverLicense: json['driver_license'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
-      idPicture: json['id_picture'],
       paymentMethod: json['payment_method'],
       totalPrice: json['total_price'].toDouble(),
       rentDate: DateTime.parse(json['rent_date']),
@@ -89,7 +86,6 @@ class Booking {
       'driver_license': driverLicense,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
-      'id_picture': idPicture,
       'payment_method': paymentMethod,
       'total_price': totalPrice,
       'rent_date': rentDate.toIso8601String(),

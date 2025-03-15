@@ -251,25 +251,6 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
                               ),
                             ),
                             SizedBox(height: 10),
-                            Text('صورة الهوية:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
-                            SizedBox(height: 5),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8), // Rounded corners for the image
-                              child: Image.network(
-                                client.idPicture,
-                                width: double.infinity,
-                                height: 150,
-                                fit: BoxFit.cover,
-                                loadingBuilder: (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return Center(child: CircularProgressIndicator(color: Colors.green));
-                                },
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Center(child: Icon(Icons.error, color: Colors.red));
-                                },
-                              ),
-                            ),
-                            SizedBox(height: 10),
                             _buildDetailRow(Icons.payment, 'طريقة الدفع: ${client.paymentMethod}'),
                             _buildDetailRow(Icons.attach_money, 'السعر الإجمالي: \$${client.totalPrice.toStringAsFixed(2)}'),
                             _buildDetailRow(Icons.calendar_today, 'تاريخ الإيجار: ${client.rentDate.toLocal()}'),

@@ -16,7 +16,6 @@ class Client {
   final String driverLicense;
   final DateTime createdAt;
   final DateTime updatedAt;
-  final String idPicture;
   final String paymentMethod;
   final double totalPrice;
   final DateTime rentDate;
@@ -40,7 +39,6 @@ class Client {
     required this.driverLicense,
     required this.createdAt,
     required this.updatedAt,
-    required this.idPicture,
     required this.paymentMethod,
     required this.totalPrice,
     required this.rentDate,
@@ -66,7 +64,6 @@ class Client {
       driverLicense: json['driver_license'],
       createdAt: DateTime.parse(json['created_at']),
       updatedAt: DateTime.parse(json['updated_at']),
-      idPicture: json['id_picture'],
       paymentMethod: json['payment_method'],
       totalPrice: json['total_price'].toDouble(),
       rentDate: DateTime.parse(json['rent_date']),

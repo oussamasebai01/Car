@@ -270,6 +270,12 @@ class _AddInstitutionCarScreenState extends State<AddInstitutionCarScreen> {
             builder: (context) => MyBookingScreen(),
           ),
         );
+      } else if (response.statusCode == 302) {
+        // Handle redirection
+        print('Redirected to: ${response.headers['location']}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('تم إعادة التوجيه إلى: ${response.headers['location']}')),
+        );
       } else {
         final errorResponse = json.decode(response.body);
         throw Exception(errorResponse['error'] ?? 'فشل في إرسال النموذج');

@@ -87,8 +87,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         selectedCountry != null &&
         selectedCityId != null &&
         _paymentMethod != null &&
-        _licenseImage != null &&
-        _idImage != null;
+        _licenseImage != null ;
   }
 
   Future<List<Map<String, dynamic>>> fetchCountries() async {
@@ -198,7 +197,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     }
 
     // Validate images
-    if (_licenseImage == null || _idImage == null) {
+    if (_licenseImage == null ) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please upload both license and ID images')),
       );
@@ -222,7 +221,12 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     request.fields['building_number'] = _buildingNumberController.text;
     request.fields['nearest_location'] = _nearestLocationController.text;
     request.fields['payment_method'] = _paymentMethod ?? '';
-    request.fields['total_price'] = widget.prix_total;
+    if(withDriver==true){
+      request.fields['total_price'] = (double.parse(widget.prix_total)+10.0).toString();
+    }
+    else{
+      request.fields['total_price'] = widget.prix_total;
+    }
     request.fields['rent_date'] = widget.date_debut;
     request.fields['return_date'] = widget.date_fin;
 
@@ -234,14 +238,14 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       ));
     }
 
-    if (_idImage != null) {
-      request.files.add(await http.MultipartFile.fromPath(
-        'id_picture', // Nom du champ attendu par le backend
-        _idImage!.path,
-      ));
-    }
+    // if (_idImage != null) {
+    //   request.files.add(await http.MultipartFile.fromPath(
+    //     'id_picture', // Nom du champ attendu par le backend
+    //     _idImage!.path,
+    //   ));
+    // }
 
-    print("files :$request.files.id_picture");
+   // print("files :$request.files.id_picture");
     print("files :$request.files.driver_license");
     print("fields : $request.fields");
 
@@ -444,7 +448,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                 SizedBox(height: 10),
                 _buildImagePicker('رخصة القيادة', _licenseImage, true),
                 SizedBox(height: 10),
-                _buildImagePicker('صورة الهوية أو جواز السفر', _idImage, false),
+                //_buildImagePicker('صورة الهوية أو جواز السفر', _idImage, false),
                 SizedBox(height: 10),
                 _buildDropdown('طريقة الدفع', _paymentMethod, _paymentMethods, (value) {
                   setState(() {
