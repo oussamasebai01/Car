@@ -109,7 +109,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
     } catch (e) {
       print("خطأ: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("حدث خطأ أثناء البحث عن السيارات: $e")),
+        SnackBar(content: Text("لا يوجد سيارات متاحة الان في هده المنطقة")),
       );
     }
   }

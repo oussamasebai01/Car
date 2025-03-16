@@ -424,7 +424,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Image.asset(
-            'assets/images/no_booking.png',
+            'assets/images/no_booking.jpg',
             height: 100,
           ),
           const SizedBox(height: 16),

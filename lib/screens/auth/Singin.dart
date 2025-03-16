@@ -62,7 +62,11 @@ class _SignInScreenState extends State<SignInScreen> {
         // حفظ الرمز في SharedPreferences
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
+        await prefs.remove('id');
         await prefs.setInt('id', _id);
+
+        final _id2 = await prefs.get('id');
+        print('idddd :$_id2');
         print('id dans prefs: $_id');
         print(token);
 
@@ -148,7 +152,7 @@ class _SignInScreenState extends State<SignInScreen> {
 
               // حقل البريد الإلكتروني
               const Text(
-                "البريد الإلكتروني",
+                "رقم الهاتف",
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
@@ -159,8 +163,8 @@ class _SignInScreenState extends State<SignInScreen> {
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  hintText: "رقم الهاتف",
-                  prefixIcon: const Icon(Icons.email, color: Colors.grey),
+                  hintText: " أدخل رقم الهاتف",
+                  prefixIcon: const Icon(Icons.phone, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),

@@ -139,10 +139,12 @@ class NotificationService {
       'transports': ['websocket'],
       'autoConnect': true,
     });
-
+    print('stored :$storedInstitutionId');
     socket.on('notification', (data) async {
       if (data is Map<String, dynamic>) {
         final receivedInstitutionId = data['institution_id'];
+        print('id recived :$receivedInstitutionId');
+        print('stored :$storedInstitutionId');
         final String message = data['message'].toString();
 
         int? institutionId = receivedInstitutionId is int
@@ -205,4 +207,3 @@ void requestNotificationPermission() async {
     await AwesomeNotifications().requestPermissionToSendNotifications();
   }
 }
-

@@ -3,6 +3,7 @@ import 'package:car/utils/config.dart';
 import 'package:car/utils/constant.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'dart:io';
 
 class RegisterInstitutionScreen extends StatefulWidget {
@@ -51,20 +52,7 @@ class _RegisterInstitutionScreenState extends State<RegisterInstitutionScreen> {
         showDialog(
           context: context,
           builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('تم التسجيل بنجاح!'),
-              content: Text(
-                  'طلب التسجيل قيد المعالجة. سيتم إرسال بريد إلكتروني ورسالة واتساب للتأكيد قريبًا.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    // الانتقال إلى /DashboardClient
-                    Navigator.pushReplacementNamed(context, '/DashboardClient');
-                  },
-                  child: Text('موافق'),
-                ),
-              ],
-            );
+            return OTPVerificationPopup(phoneNumber:_numberController.text);
           },
         );
       } else {
@@ -289,6 +277,7 @@ class _RegisterInstitutionScreenState extends State<RegisterInstitutionScreen> {
     );
   }
 
+
   // دالة لبناء DropdownButton
   Widget _buildOrgTypeDropdown() {
     return Container(
@@ -322,6 +311,93 @@ class _RegisterInstitutionScreenState extends State<RegisterInstitutionScreen> {
           }
           return null;
         },
+      ),
+    );
+  }
+}
+class OTPVerificationPopup extends StatefulWidget {
+  final String phoneNumber;
+
+  OTPVerificationPopup({required this.phoneNumber});
+
+  @override
+  _OTPVerificationPopupState createState() => _OTPVerificationPopupState();
+}
+
+class _OTPVerificationPopupState extends State<OTPVerificationPopup> {
+  final List<TextEditingController> _otpControllers = List.generate(6, (index) => TextEditingController());
+
+  Future<void> _verifyOTP() async {
+    String otp = _otpControllers.map((controller) => controller.text).join();
+
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:8000/api/verify-otp'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'phone_number': widget.phoneNumber,
+        'otp': otp,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      // OTP vérifié avec succès
+      Navigator.of(context).pop(); // Fermer la popup
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('OTP vérifié. En attente de l\'approbation de l\'administrateur.')),
+      );
+      // Naviguer vers une nouvelle page
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => SignInScreen()),
+      );
+    } else if (response.statusCode == 400 || response.statusCode == 401) {
+      // Afficher un message d'erreur
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('OTP ou numéro de téléphone invalide.')),
+      );
+    } else {
+      // Gérer d'autres erreurs
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Une erreur s\'est produite. Veuillez réessayer.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text("Vérification OTP"),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text("Veuillez entrer le code OTP reçu"),
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: List.generate(6, (index) {
+              return SizedBox(
+                width: 40,
+                child: TextField(
+                  controller: _otpControllers[index],
+                  textAlign: TextAlign.center,
+                  maxLength: 1,
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    counterText: "",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              );
+            }),
+          ),
+          SizedBox(height: 20),
+          ElevatedButton(
+            onPressed: _verifyOTP,
+            child: Text("Vérifier"),
+          ),
+        ],
       ),
     );
   }

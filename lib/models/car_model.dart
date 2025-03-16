@@ -88,202 +88,210 @@ return {
 }
 
 class CarDetailsPage extends StatelessWidget {
-final CarModel car;
-final int numberOfDays;
-final String date_debut;
-final String date_fin;
+  final CarModel car;
+  final int numberOfDays;
+  final String date_debut;
+  final String date_fin;
 
-CarDetailsPage({required this.car, required this. numberOfDays, required this.date_debut, required this.date_fin});
+  CarDetailsPage(
+      {required this.car, required this.numberOfDays, required this.date_debut, required this.date_fin});
 
-late String prix_total =  (numberOfDays*car.pricePerDay).toString();
+  late String prix_total = (numberOfDays * car.pricePerDay).toString();
 
-@override
-Widget build(BuildContext context) {
-return Scaffold(
-appBar: AppBar(
-title: Text(car.modelName), // Utiliser car.modelName comme titre
-backgroundColor: Colors.green, // AppBar noire pour un style moderne
-elevation: 0, // Supprimer l'ombre
-),
-body: SingleChildScrollView(
-padding: EdgeInsets.all(16),
-child: Column(
-crossAxisAlignment: CrossAxisAlignment.start,
-children: [
-// Image par défaut
-ClipRRect(
-borderRadius: BorderRadius.circular(12), // Bordure arrondie
-child: Image.asset(
-"assets/bmw_x5.png", // Image par défaut
-fit: BoxFit.cover,
-width: double.infinity,
-height: 200, // Hauteur de l'image
-),
-),
-SizedBox(height: 16),
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(car.modelName), // استخدام car.modelName كعنوان
+        backgroundColor: Colors.green, // لون خلفية الشريط الأخضر
+        elevation: 0, // إزالة الظل
+      ),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // الصورة الافتراضية
+            ClipRRect(
+              borderRadius: BorderRadius.circular(12), // حواف مدورة
+              child: Image.asset(
+                "assets/bmw_x5.png", // الصورة الافتراضية
+                fit: BoxFit.cover,
+                width: double.infinity,
+                height: 200, // ارتفاع الصورة
+              ),
+            ),
+            SizedBox(height: 16),
 
-// Prix total et prix par jour
-Row(
-children: [
-Text(
-'\$${car.pricePerDay * numberOfDays}', // Prix total
-style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-),
-Spacer(), // Pousse le deuxième texte à l'extrême droite
-Text(
-'\$${car.pricePerDay}/day', // Prix par jour
-style: TextStyle(fontSize: 16, color: Colors.grey),
-),
-],
-),
-SizedBox(height: 16),
+            // السعر الإجمالي والسعر اليومي
+            Row(
+              children: [
+                Text(
+                  '\$${car.pricePerDay * numberOfDays}', // السعر الإجمالي
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                Spacer(), // دفع النص الثاني إلى أقصى اليمين
+                Text(
+                  '\$${car.pricePerDay}/يوم', // السعر اليومي
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
 
-// Informations de base
-Text(
-'Fabricant : ${car.manufacturerName}',
-style: TextStyle(fontSize: 16, color: Colors.black),
-),
-SizedBox(height: 8),
-Text(
-'Ville : ${car.city}',
-style: TextStyle(fontSize: 16, color: Colors.black),
-),
-SizedBox(height: 8),
-Text(
-'Institution : ${car.institutionName}',
-style: TextStyle(fontSize: 16, color: Colors.black),
-),
-SizedBox(height: 16),
+            // المعلومات الأساسية
+            Text(
+              'الشركة المصنعة: ${car.manufacturerName}',
+              style: TextStyle(fontSize: 16, color: Colors.black),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'المدينة: ${car.city}',
+              style: TextStyle(fontSize: 16, color: Colors.black),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'المؤسسة: ${car.institutionName}',
+              style: TextStyle(fontSize: 16, color: Colors.black),
+            ),
+            SizedBox(height: 16),
 
-// Spécifications techniques
-Text(
-'Spécifications',
-style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-),
-SizedBox(height: 8),
-Row(
-children: [
-Expanded(
-child: Column(
-crossAxisAlignment: CrossAxisAlignment.start,
-children: [
-Text('Sièges', style: TextStyle(color: Colors.grey)),
-Row(
-children: [
-Icon(
-Icons.people_alt ,
-size: 24,
-color: Colors.green,
-),
-Text('  ${car.seatNumber}', style: TextStyle(fontSize: 16)),
-],
-),
+            // المواصفات الفنية
+            Text(
+              'المواصفات',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('المقاعد', style: TextStyle(color: Colors.grey)),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.people_alt,
+                            size: 24,
+                            color: Colors.green,
+                          ),
+                          Text('  ${car.seatNumber}', style: TextStyle(
+                              fontSize: 16)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('نوع الوقود', style: TextStyle(color: Colors.grey)),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.local_gas_station,
+                            size: 24,
+                            color: Colors.green,
+                          ),
+                          Text(" " + car.gazType, style: TextStyle(
+                              fontSize: 16)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('اللون', style: TextStyle(color: Colors.grey)),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.color_lens,
+                            size: 24,
+                            color: Colors.green,
+                          ),
+                          Text("  " + car.carColor, style: TextStyle(
+                              fontSize: 16)),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16),
 
-],
-),
-),
-Expanded(
-child: Column(
-crossAxisAlignment: CrossAxisAlignment.start,
-children: [
-Text('Carburant', style: TextStyle(color: Colors.grey)),
-Row(
-children: [
-Icon(
-Icons.local_gas_station ,
-size: 24,
-color: Colors.green,
-),
-Text(" "+car.gazType, style: TextStyle(fontSize: 16)),
-],
-),
+            // ناقل الحركة
+            Row(
+              children: [
+                Icon(
+                  Icons.tune,
+                  size: 24,
+                  color: Colors.green,
+                ),
+                Text(
+                  '    ${car.transmission}',
+                  style: TextStyle(fontSize: 16, color: Colors.black),
+                ),
+              ],
+            ),
 
-],
-),
-),
-Expanded(
-child: Column(
-crossAxisAlignment: CrossAxisAlignment.start,
-children: [
-Text('Couleur', style: TextStyle(color: Colors.grey)),
-Row(
-children: [
-Icon(
-Icons.color_lens ,
-size: 24,
-color: Colors.green,
-),
-Text("  "+car.carColor, style: TextStyle(fontSize: 16)),
-],
-),
+            SizedBox(height: 16),
 
-],
-),
-),
-],
-),
-SizedBox(height: 16),
+            Row(
+              children: [
+                Icon(
+                  Icons.tag,
+                  size: 24,
+                  color: Colors.green,
+                ),
+                Text(
+                  '  : ${car.tagNumber}',
+                  style: TextStyle(fontSize: 16, color: Colors.black),
+                ),
+              ],
+            ),
+            // الرقم التعريفي
 
-// Transmission
-Row(
-children: [
-Icon(
-Icons.tune ,
-size: 24,
-color: Colors.green,
-),
-Text(
-'    ${car.transmission}',
-style: TextStyle(fontSize: 16, color: Colors.black),
-),
-],
-),
+            SizedBox(height: 16),
 
-SizedBox(height: 16),
-
-Row(children: [
-Icon(
-Icons.tag ,
-size: 24,
-color: Colors.green,
-),
-Text(
-'  : ${car.tagNumber}',
-style: TextStyle(fontSize: 16, color: Colors.black),
-),
-],),
-// Tag
-
-SizedBox(height: 16),
-
-// Bouton "Book Now"
-SizedBox(
-width: double.infinity,
-child: ElevatedButton(
-onPressed: () {
-Navigator.push(
-context,
-MaterialPageRoute(
-builder: (context) => BookingDetailScreen(date_debut :date_debut , date_fin: date_fin,prix_total:prix_total,id:car.id),
-),
-);
-},
-style: ElevatedButton.styleFrom(
-padding: EdgeInsets.symmetric(vertical: 16),
-shape: RoundedRectangleBorder(
-borderRadius: BorderRadius.circular(12),
-),
-backgroundColor: Colors.green, // Bouton noir
-),
-child: Text(
-"Book Now",
-style: TextStyle(color: Colors.white, fontSize: 16),
-),
-),
-),
-],
-),
-),
-);
-}
+            // زر "احجز الآن"
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          BookingDetailScreen(
+                              date_debut: date_debut,
+                              date_fin: date_fin,
+                              prix_total: prix_total,
+                              id: car.id),
+                    ),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  backgroundColor: Colors.green, // لون الزر الأخضر
+                ),
+                child: Text(
+                  "احجز الآن",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

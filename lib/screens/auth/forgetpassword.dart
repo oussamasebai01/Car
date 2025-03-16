@@ -20,12 +20,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final email = _emailController.text.trim();
 
     // التحقق من صحة البريد الإلكتروني
-    if (email.isEmpty || !email.contains('@')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الرجاء إدخال بريد إلكتروني صحيح')),
-      );
-      return;
-    }
+    // if (email.isEmpty || !email.contains('@')) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('الرجاء إدخال بريد إلكتروني صحيح')),
+    //   );
+    //   return;
+    // }
 
     setState(() {
       _isLoading = true; // إظهار مؤشر التحميل
@@ -36,7 +36,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       const url = '${Config.BASE_URL}/password/send-otp';
 
       // بيانات الطلب
-      final body = jsonEncode({'email': email});
+      final body = jsonEncode({'phone_number': email});
 
       // إرسال طلب POST
       final response = await http.post(
@@ -95,11 +95,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           children: [
             TextField(
               controller: _emailController,
-              keyboardType: TextInputType.emailAddress,
+              keyboardType: TextInputType.phone,
               decoration: const InputDecoration(
-                labelText: 'البريد الإلكتروني',
+                labelText: 'رقم الهاتف',
                 border: OutlineInputBorder(),
-                hintText: 'أدخل بريدك الإلكتروني',
+                hintText: 'أدخل رقم الهاتف',
               ),
             ),
             const SizedBox(height: 20),

@@ -310,21 +310,32 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
               children: [
                 Image.asset("assets/bmw_x5.png", fit: BoxFit.cover, width: double.infinity),
                 SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('With Driver', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                    CupertinoSwitch(
-                      value: withDriver,
-                      activeColor: primaryColor,
-                      onChanged: (value) {
-                        setState(() {
-                          withDriver = value;
-                        });
-                      },
+              Row(
+                children: [
+                  Text('With Driver', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  if (withDriver) // Afficher "+10 JOD" uniquement si le switch est activé
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text(
+                        '+10 JOD',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green, // Vous pouvez personnaliser la couleur
+                        ),
+                      ),
                     ),
-                  ],
-                ),
+                  CupertinoSwitch(
+                    value: withDriver,
+                    activeColor: primaryColor,
+                    onChanged: (value) {
+                      setState(() {
+                        withDriver = value;
+                      });
+                    },
+                  ),
+                ],
+              ),
                 SizedBox(height: 20),
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: fetchCountries(),

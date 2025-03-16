@@ -48,7 +48,7 @@ class _OtpScreenState extends State<OtpScreen> {
 
       // بيانات الطلب
       final body = jsonEncode({
-        'email': widget.email,
+        'phone_number': widget.email,
         'otp': otp,
         'password': password,
       });
