@@ -437,7 +437,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                     },
                   ),
                 SizedBox(height: 10),
-                _buildTextField('رقم الهوية أو جواز السفر', _idController, isRequired: true, fieldKey: 'national_id'),
+                _buildTextField('رقم الرخصة', _idController, isRequired: true, fieldKey: 'national_id'),
                 SizedBox(height: 10),
                 _buildTextField('الاسم الأول', _firstNameController, isRequired: true, fieldKey: 'first_name'),
                 SizedBox(height: 10),
