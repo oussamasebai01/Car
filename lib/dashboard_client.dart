@@ -18,6 +18,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
   List<String> cities = [];
   List<CarModel> cars = [];
   int numberOfDays = 0;
+  String? selectedSortOption; // For sorting by price
 
   late Future<List<Map<String, dynamic>>> fetchedCountries;
 
@@ -71,6 +72,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
   }
 
   Future<void> searchCars() async {
+    // Check if required fields are filled
     if (selectedCity == null || _pickupDateController.text.isEmpty || _returnDateController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("الرجاء تحديد مدينة وتواريخ صالحة.")),
@@ -78,6 +80,19 @@ class _CarSearchPageState extends State<CarSearchPage> {
       return;
     }
 
+    // Parse dates
+    DateTime pickupDate = DateTime.parse(_pickupDateController.text);
+    DateTime returnDate = DateTime.parse(_returnDateController.text);
+
+    // Validate that return_date is after rent_date
+    if (returnDate.isBefore(pickupDate) || returnDate.isAtSameMomentAs(pickupDate)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("تاريخ التسليم يجب أن يكون بعد تاريخ الاستلام.")),
+      );
+      return;
+    }
+
+    // Proceed with the API call
     final url = Uri.parse('${Config.BASE_URL}/get-available-institution-cars-by-city');
     final body = jsonEncode({
       "city": selectedCity,
@@ -96,20 +111,30 @@ class _CarSearchPageState extends State<CarSearchPage> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         print(responseData);
-        setState(() {
-          cars = (responseData['data'] as List)
-              .map((carJson) => CarModel.fromJson(carJson)) // استخدام طريقة fromJson المحدثة
-              .toList();
-          print(cars);
-          print("تم تحليل السيارة: ${CarModel.fromJson(responseData['data'][0])}");
-        });
+
+        if (responseData['data'] != null && responseData['data'].isNotEmpty) {
+          setState(() {
+            cars = (responseData['data'] as List)
+                .map((carJson) => CarModel.fromJson(carJson)) // استخدام طريقة fromJson المحدثة
+                .toList();
+            sortCars(); // Sort cars after fetching
+            print(cars);
+          });
+        } else {
+          setState(() {
+            cars = []; // Clear the cars list if no data is available
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("لا توجد سيارات متاحة للفترة المحددة.")),
+          );
+        }
       } else {
         throw Exception('فشل في تحميل السيارات: ${response.statusCode}');
       }
     } catch (e) {
       print("خطأ: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("لا يوجد سيارات متاحة الان في هده المنطقة")),
+        SnackBar(content: Text("حدث خطأ أثناء جلب السيارات.")),
       );
     }
   }
@@ -139,6 +164,14 @@ class _CarSearchPageState extends State<CarSearchPage> {
       setState(() {
         numberOfDays = returnDate.difference(pickupDate).inDays;
       });
+    }
+  }
+
+  void sortCars() {
+    if (selectedSortOption == 'السعر: من الأقل إلى الأعلى') {
+      cars.sort((a, b) => a.pricePerDay.compareTo(b.pricePerDay));
+    } else if (selectedSortOption == 'السعر: من الأعلى إلى الأقل') {
+      cars.sort((a, b) => b.pricePerDay.compareTo(a.pricePerDay));
     }
   }
 
@@ -187,22 +220,21 @@ class _CarSearchPageState extends State<CarSearchPage> {
 
                           List<Map<String, dynamic>> countries = snapshot.data!;
 
-                          return DropdownButtonFormField<int>( // ✅ الآن يتم تخزين `int` (معرف البلد)
+                          return DropdownButtonFormField<int>(
                             value: selectedCountry != null ? int.tryParse(selectedCountry!) : null,
                             items: countries.map((country) {
                               return DropdownMenuItem<int>(
-                                value: country["id"], // ✅ استخدام الـ ID الفعلي للبلد
-                                child: Text(country["name"]), // ✅ عرض اسم البلد
+                                value: country["id"],
+                                child: Text(country["name"]),
                               );
                             }).toList(),
                             onChanged: (value) async {
                               setState(() {
-                                selectedCountry = value.toString(); // ✅ تخزين معرف البلد المحدد كـ String
+                                selectedCountry = value.toString();
                                 selectedCity = null;
                                 cities = [];
                               });
 
-                              // ✅ جلب مدن البلد المحدد
                               List<String> fetchedCities = await fetchCities(value!);
                               setState(() {
                                 cities = fetchedCities;
@@ -267,6 +299,25 @@ class _CarSearchPageState extends State<CarSearchPage> {
                     ],
                   ),
                 ),
+              ),
+              SizedBox(height: 16),
+              // Sorting Dropdown
+              DropdownButton<String>(
+                value: selectedSortOption,
+                hint: Text("ترتيب حسب السعر"),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    selectedSortOption = newValue;
+                    sortCars(); // Sort cars when the user selects an option
+                  });
+                },
+                items: <String>['السعر: من الأقل إلى الأعلى', 'السعر: من الأعلى إلى الأقل']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
               ),
               SizedBox(height: 16),
               GridView.builder(
