@@ -1,6 +1,7 @@
 import 'package:car/screens/Auth/Singin.dart';
 import 'package:car/screens/Auth/forgetpassword.dart';
 import 'package:car/screens/Auth/otpverify.dart';
+import 'package:car/map.dart';
 import 'package:car/screens/auth/Signup_screen.dart';
 import 'package:car/screens/institutions/BookingList.dart';
 import 'package:car/screens/institutions/CanceledList.dart';
