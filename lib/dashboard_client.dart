@@ -19,6 +19,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
   List<String> cities = [];
   List<CarModel> cars = [];
   int numberOfDays = 0;
+  String? selectedSortOption; // For sorting by price
 
   late Future<List<Map<String, dynamic>>> fetchedCountries;
   late Future<List<String>> futureCities;
@@ -57,12 +58,12 @@ class _CarSearchPageState extends State<CarSearchPage> {
 
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
-        return data.cast<String>(); // Convertir en liste de String
+        return data.cast<String>(); // Convert to list of String
       } else {
-        throw Exception('Erreur lors du chargement des villes');
+        throw Exception('خطأ في تحميل المدن');
       }
     } catch (e) {
-      throw Exception('Erreur de connexion : $e');
+      throw Exception('خطأ في الاتصال: $e');
     }
   }
 
@@ -75,7 +76,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
 
         return countriesFromServer.map((country) {
           return {
-            "id": country["id"], // ✅ يتم استرجاع الـ ID
+            "id": country["id"], // ✅ استرجاع الـ ID
             "name": country["name_en"] // ✅ اسم البلد بالعربية
           };
         }).toList();
@@ -105,7 +106,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
     });
 
     try {
-      print("جاري المحاولة");
+      print("جاري المحاولة...");
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
@@ -119,8 +120,8 @@ class _CarSearchPageState extends State<CarSearchPage> {
           cars = (responseData['data'] as List)
               .map((carJson) => CarModel.fromJson(carJson)) // استخدام طريقة fromJson المحدثة
               .toList();
+          sortCars(); // ترتيب السيارات بعد جلبها
           print(cars);
-          print("تم تحليل السيارة: ${CarModel.fromJson(responseData['data'][0])}");
         });
       } else {
         throw Exception('فشل في تحميل السيارات: ${response.statusCode}');
@@ -128,7 +129,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
     } catch (e) {
       print("خطأ: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("لا يوجد سيارات متاحة الان في هده المنطقة")),
+        SnackBar(content: Text("لا توجد سيارات متاحة في هذه المنطقة حاليًا.")),
       );
     }
   }
@@ -161,6 +162,14 @@ class _CarSearchPageState extends State<CarSearchPage> {
     }
   }
 
+  void sortCars() {
+    if (selectedSortOption == 'السعر: من الأقل إلى الأعلى') {
+      cars.sort((a, b) => a.pricePerDay.compareTo(b.pricePerDay));
+    } else if (selectedSortOption == 'السعر: من الأعلى إلى الأقل') {
+      cars.sort((a, b) => b.pricePerDay.compareTo(a.pricePerDay));
+    }
+  }
+
   @override
   void initState() {
     fetchedCountries = fetchCountries();
@@ -184,7 +193,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
       ),
       body: Stack(
         children: [
-          // Contenu principal avec SingleChildScrollView
+          // المحتوى الرئيسي مع SingleChildScrollView
           SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -291,6 +300,25 @@ class _CarSearchPageState extends State<CarSearchPage> {
                     ),
                   ),
                   SizedBox(height: 16),
+                  // Dropdown للترتيب حسب السعر
+                  DropdownButton<String>(
+                    value: selectedSortOption,
+                    hint: Text("ترتيب حسب السعر"),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedSortOption = newValue;
+                        sortCars(); // ترتيب السيارات عند اختيار الخيار
+                      });
+                    },
+                    items: <String>['السعر: من الأقل إلى الأعلى', 'السعر: من الأعلى إلى الأقل']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  ),
+                  SizedBox(height: 16),
                   GridView.builder(
                     shrinkWrap: true,
                     physics: NeverScrollableScrollPhysics(),
@@ -320,30 +348,28 @@ class _CarSearchPageState extends State<CarSearchPage> {
             ),
           ),
 
-          // Bouton en bas de l'écran
-
+          // زر الخريطة في الزاوية اليمنى السفلية
+          Positioned(
+            bottom: 16,
+            right: 16,
+            child: FloatingActionButton.extended(
+              onPressed: () {
+                futureCities.then((cities) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MapScreen(cityNames: cities),
+                    ),
+                  );
+                });
+              },
+              label: Text("الخريطة"),
+              icon: Icon(Icons.map_outlined),
+              backgroundColor: Colors.green,
+            ),
+          ),
         ],
       ),
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: FloatingActionButton.extended(
-          onPressed: () {
-            futureCities.then((cities) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MapScreen(cityNames: cities),
-                ),
-              );
-            });
-          },
-          label: Text("Maps"),
-          icon: Icon(Icons.map_outlined),
-          backgroundColor: Colors.green,
-        ),
-      ),
     );
-
   }
-
 }
