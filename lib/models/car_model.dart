@@ -18,7 +18,7 @@ final int seatNumber;
 final String modelName;
 final String manufacturerName;
 final String institutionName;
-final int availability; // Ajoutez ce champ
+final int availability;
 
 CarModel({
 required this.id,
