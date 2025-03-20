@@ -112,7 +112,6 @@ class _FinishedScreenState extends State<FinishedScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildDetailRow(Icons.email, 'البريد الإلكتروني: ${finished.email}'),
                             _buildDetailRow(Icons.phone, 'الهاتف: ${finished.phoneNumber}'),
                             _buildDetailRow(Icons.phone_android, 'واتساب: ${finished.whatsappNumber}'),
                             _buildDetailRow(Icons.location_on, 'العنوان: ${finished.street}, ${finished.buildingNumber}, ${finished.nearestLocation}'),

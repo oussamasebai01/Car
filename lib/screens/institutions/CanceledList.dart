@@ -112,7 +112,6 @@ class _CanceledListScreenState extends State<CanceledListScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildDetailRow(Icons.email, 'البريد الإلكتروني: ${canceled.email}'),
                             _buildDetailRow(Icons.phone, 'الهاتف: ${canceled.phoneNumber}'),
                             _buildDetailRow(Icons.phone_android, 'واتساب: ${canceled.whatsappNumber}'),
                             _buildDetailRow(Icons.location_on, 'العنوان: ${canceled.street}, ${canceled.buildingNumber}, ${canceled.nearestLocation}'),

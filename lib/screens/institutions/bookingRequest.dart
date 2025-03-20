@@ -64,6 +64,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
       },
     );
 
+    print(response.statusCode);
     if (response.statusCode == 201) {
       // Refresh the list after approval
       setState(() {
@@ -227,7 +228,6 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildDetailRow(Icons.email, 'البريد الإلكتروني: ${client.email}'),
                             _buildDetailRow(Icons.phone, 'الهاتف: ${client.phoneNumber}'),
                             _buildDetailRow(Icons.phone_android, 'واتساب: ${client.whatsappNumber}'),
                             _buildDetailRow(Icons.location_on, 'العنوان: ${client.street}, ${client.buildingNumber}, ${client.nearestLocation}'),

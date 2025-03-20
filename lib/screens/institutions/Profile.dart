@@ -380,7 +380,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Icon(Icons.person),
                   ),
                   title: Text(user['name'] ?? 'غير متوفر'),
-                  subtitle: Text(user['email'] ?? 'غير متوفر'),
                 );
               },
             ),

@@ -228,7 +228,6 @@ class _BookingListScreenState extends State<BookingListScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildDetailRow(Icons.email, 'البريد الإلكتروني: ${booking.email}'),
                             _buildDetailRow(Icons.phone, 'الهاتف: ${booking.phoneNumber}'),
                             if (booking.whatsappNumber != null)
                               _buildDetailRow(Icons.phone_android, 'واتساب: ${booking.whatsappNumber}'),

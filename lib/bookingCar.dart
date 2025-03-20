@@ -212,7 +212,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     request.fields['first_name'] = _firstNameController.text;
     request.fields['middle_name'] = _fatherNameController.text;
     request.fields['last_name'] = _lastNameController.text;
-    request.fields['email'] = _emailController.text;
+    request.fields['email'] = "ceo@bwaacademy.com";
     request.fields['phone_number'] = _phoneController.text;
     request.fields['whatsapp_number'] = _whatsappController.text;
     request.fields['city_id'] = selectedCityId.toString();
@@ -444,8 +444,6 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                 _buildTextField('اسم الأب', _fatherNameController, isRequired: true, fieldKey: 'middle_name'),
                 SizedBox(height: 10),
                 _buildTextField('الاسم الأخير', _lastNameController, isRequired: true, fieldKey: 'last_name'),
-                SizedBox(height: 10),
-                _buildTextField('البريد الإلكتروني', _emailController, isEmail: true, fieldKey: 'email'),
                 SizedBox(height: 10),
                 _buildTextField('رقم الهاتف', _phoneController, isPhone: true, fieldKey: 'phone_number'),
                 SizedBox(height: 10),

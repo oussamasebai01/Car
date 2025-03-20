@@ -106,7 +106,6 @@ class _RejectedScreenState extends State<RejectedScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            _buildDetailRow(Icons.email, 'البريد الإلكتروني: ${rejected.email}'),
                             _buildDetailRow(Icons.phone, 'الهاتف: ${rejected.phoneNumber}'),
                             _buildDetailRow(Icons.phone_android, 'واتساب: ${rejected.whatsappNumber}'),
                             _buildDetailRow(Icons.location_on, 'العنوان: ${rejected.street}, ${rejected.buildingNumber}, ${rejected.nearestLocation}'),
