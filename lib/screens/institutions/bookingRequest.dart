@@ -65,6 +65,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
     );
 
     print(response.statusCode);
+
     if (response.statusCode == 201) {
       // Refresh the list after approval
       setState(() {
@@ -189,6 +190,7 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator(color: Colors.green));
           } else if (snapshot.hasError) {
+            print(snapshot.error);
             return Center(child: Text('خطأ: ${snapshot.error}', style: TextStyle(color: Colors.red)));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text('لا توجد عملاء معلقين.', style: TextStyle(color: Colors.grey)));

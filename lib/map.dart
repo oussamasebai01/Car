@@ -72,8 +72,8 @@ class _MapScreenState extends State<MapScreen> {
       body: FlutterMap(
         mapController: mapController,
         options: MapOptions(
-          initialCenter: LatLng(33.8869, 9.5375), // Centre de la France
-          initialZoom: 5.0,
+          initialCenter: LatLng(31.9539, 35.9106), // Centre de la France
+          initialZoom: 7.0,
         ),
         children: [
           TileLayer(

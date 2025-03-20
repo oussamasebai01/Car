@@ -9,13 +9,15 @@ import '../../utils/constant.dart';
 import 'package:intl/intl.dart';
 
 import 'dashboard_client.dart';
+import 'models/car_model.dart';
 
 class BookingDetailScreen extends StatefulWidget {
   final String date_debut;
   final String date_fin;
   final String prix_total;
   final int id;
-  const BookingDetailScreen({Key? key, required this.date_debut, required this.date_fin, required this.prix_total , required this.id}) : super(key: key);
+  final CarModel car ;
+  const BookingDetailScreen({Key? key, required this.date_debut, required this.date_fin, required this.prix_total , required this.id, required this.car}) : super(key: key);
 
   @override
   State<BookingDetailScreen> createState() => _BookingDetailScreenState();
@@ -270,6 +272,30 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
       );
     }
   }
+  String createCarImage(CarModel car, String angle, String color) {
+    // Base API URL for generating car images
+    final url = Uri.https("cdn.imagin.studio", "/getimage");
+
+    // Destructure the necessary properties from the car object
+    final manuYear = car.manu_year;
+    final modelName = car.modelName; // Get the model name in English
+    final manufacturerName = car.manufacturerName; // Get the manufacturer name
+
+    // Append query parameters for the API request
+    final params = {
+      "customer": "img", // API key
+      "zoomType": "relative", // Zoom type
+      "paintdescription": color, // Example color
+      "modelFamily": modelName.split(" ")[0], // First word of the model name
+      "make": manufacturerName, // Car make
+      "modelYear": "$manuYear", // Manufacturing year
+      "angle": angle, // Car angle
+      "width": "800",
+    };
+
+    // Return the constructed URL as a string
+    return url.replace(queryParameters: params).toString();
+  }
 
   @override
   void initState() {
@@ -279,6 +305,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final imageUrl = createCarImage(widget.car, "03", widget.car.carColor);
     return Scaffold(
       bottomSheet: Container(
         padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
@@ -308,7 +335,30 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.asset("assets/bmw_x5.png", fit: BoxFit.cover, width: double.infinity),
+                ClipRRect(
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                  child: FutureBuilder(
+                    future: precacheImage(NetworkImage(imageUrl), context),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        // Si l'image est chargée, l'afficher
+                        return Image.network(
+                          imageUrl,
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: 150, // Limite l'image à 40% de la carte
+                        );
+                      } else {
+                        // Pendant le chargement, afficher un indicateur de progression
+                        return Container(
+                          height: 90,
+                          color: Colors.grey[300],
+                          child: Center(child: CircularProgressIndicator()),
+                        );
+                      }
+                    },
+                  ),
+                ),
                 SizedBox(height: 20),
               Row(
                 children: [

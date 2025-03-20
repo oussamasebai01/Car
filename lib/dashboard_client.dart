@@ -347,28 +347,25 @@ class _CarSearchPageState extends State<CarSearchPage> {
               ),
             ),
           ),
-
-          // زر الخريطة في الزاوية اليمنى السفلية
-          Positioned(
-            bottom: 16,
-            right: 16,
-            child: FloatingActionButton.extended(
-              onPressed: () {
-                futureCities.then((cities) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MapScreen(cityNames: cities),
-                    ),
-                  );
-                });
-              },
-              label: Text("الخريطة"),
-              icon: Icon(Icons.map_outlined),
-              backgroundColor: Colors.green,
-            ),
-          ),
         ],
+      ),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: FloatingActionButton.extended(
+          onPressed: () {
+            futureCities.then((cities) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MapScreen(cityNames: cities),
+                ),
+              );
+            });
+          },
+          label: Text("الخريطة" ,style: TextStyle(color: Colors.white),),
+          icon: Icon(Icons.map,color: Colors.white,),
+          backgroundColor: Color.fromRGBO(0, 150, 55, 1.0),
+        ),
       ),
     );
   }

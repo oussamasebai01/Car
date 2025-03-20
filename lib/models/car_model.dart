@@ -313,7 +313,8 @@ class CarDetailsPage extends StatelessWidget {
                               date_debut: date_debut,
                               date_fin: date_fin,
                               prix_total: prix_total,
-                              id: car.id),
+                              id: car.id,
+                              car: car,),
                     ),
                   );
                 },
