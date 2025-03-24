@@ -63,35 +63,34 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
   Future<List<CarModel>>? futureCars;
   List<CarModel> filteredBookings = [];
   TextEditingController searchController = TextEditingController();
-  // Fonction pour générer l'URL de l'image
+
   String createCarImage(CarModel car, String angle, String color) {
-    // Base API URL for generating car images
     final url = Uri.https("cdn.imagin.studio", "/getimage");
-
-    // Destructure the necessary properties from the car object
     final manuYear = car.manu_year;
-    final modelName = car.modelName; // Get the model name in English
-    final manufacturerName = car.manufacturerName; // Get the manufacturer name
+    final modelName = car.modelName;
+    final manufacturerName = car.manufacturerName;
 
-    // Append query parameters for the API request
     final params = {
-      "customer": "img", // API key
-      "zoomType": "relative", // Zoom type
-      "paintdescription": color, // Example color
-      "modelFamily": modelName.split(" ")[0], // First word of the model name
-      "make": manufacturerName, // Car make
-      "modelYear": "$manuYear", // Manufacturing year
-      "angle": angle, // Car angle
+      "customer": "img",
+      "zoomType": "relative",
+      "paintdescription": color,
+      "modelFamily": modelName.split(" ")[0],
+      "make": manufacturerName,
+      "modelYear": "$manuYear",
+      "angle": angle,
       "width": "800",
     };
 
-    // Return the constructed URL as a string
     return url.replace(queryParameters: params).toString();
   }
 
   @override
   void initState() {
     super.initState();
+    _loadCars();
+  }
+
+  void _loadCars() {
     futureCars = fetchCars().then((bookings) {
       setState(() {
         filteredBookings = bookings;
@@ -117,14 +116,11 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
     });
   }
 
-  // دالة لحذف حجز عبر API
   Future<void> deleteBooking(int index) async {
     final car = filteredBookings[index];
     final token = await getAuthToken();
 
-    // مربع حوار التأكيد
     final confirmed = await showDialog(
-
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('تأكيد الحذف'),
@@ -144,7 +140,6 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
 
     if (confirmed == true) {
       try {
-        // إرسال طلب DELETE إلى API
         final response = await http.delete(
           Uri.parse('${Config.BASE_URL}/delete-institution-cars/${car.id}'),
           headers: {
@@ -153,7 +148,6 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
         );
 
         if (response.statusCode == 200) {
-          // حذف العنصر من القائمة المحلية
           setState(() {
             filteredBookings.removeAt(index);
           });
@@ -164,7 +158,6 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
             ),
           );
         } else {
-          // التعامل مع أخطاء API
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('فشل في حذف ${car.modelName}: ${response.body}'),
@@ -173,7 +166,6 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
           );
         }
       } catch (e) {
-        // التعامل مع أخطاء الاتصال
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('خطأ: ${e.toString()}'),
@@ -184,9 +176,17 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
     }
   }
 
+  // Méthode pour gérer l'actualisation
+  Future<void> _refreshPage() async {
+    setState(() {
+      searchController.clear(); // Réinitialiser la recherche
+      filteredBookings = []; // Vider la liste filtrée
+      _loadCars(); // Recharger les données
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('قائمة سياراتي', style: TextStyle(color: Colors.white)),
@@ -195,9 +195,8 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back), // زر الرجوع
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // الانتقال إلى الشاشة السابقة
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -207,47 +206,51 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
           },
         ),
       ),
-      body: Column(
-        children: [
-          // شريط البحث
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                hintText: 'ابحث عن سيارات...',
-                prefixIcon: const Icon(Icons.search, color: Colors.blueGrey),
-                filled: true,
-                fillColor: Colors.grey[200],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide.none,
+      body: RefreshIndicator(
+        onRefresh: _refreshPage, // Appeler la méthode d'actualisation
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(), // Nécessaire pour le pull-to-refresh
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'ابحث عن سيارات...',
+                    prefixIcon: const Icon(Icons.search, color: Colors.blueGrey),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onChanged: filterBookings,
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
               ),
-              onChanged: filterBookings,
-            ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.8, // Hauteur fixe pour éviter débordement
+                child: FutureBuilder<List<CarModel>>(
+                  future: futureCars,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('خطأ: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return emptyBooking();
+                    } else {
+                      return filledBooking(filteredBookings);
+                    }
+                  },
+                ),
+              ),
+            ],
           ),
-          // قائمة الحجوزات
-          Expanded(
-            child: FutureBuilder<List<CarModel>>(
-              future: futureCars,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('خطأ: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return emptyBooking();
-                } else {
-                  return filledBooking(filteredBookings);
-                }
-              },
-            ),
-          ),
-        ],
+        ),
       ),
-      // زر الإضافة العائم
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -319,15 +322,13 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
                           future: precacheImage(NetworkImage(imageUrl), context),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState == ConnectionState.done) {
-                              // Si l'image est chargée, l'afficher
                               return Image.network(
                                 imageUrl,
                                 fit: BoxFit.cover,
                                 width: 70,
-                                height: 70, // Limite l'image à 40% de la carte
+                                height: 70,
                               );
                             } else {
-                              // Pendant le chargement, afficher un indicateur de progression
                               return Container(
                                 height: 90,
                                 color: Colors.grey[300],

@@ -19,7 +19,7 @@ class _CarSearchPageState extends State<CarSearchPage> {
   List<String> cities = [];
   List<CarModel> cars = [];
   int numberOfDays = 0;
-  String? selectedSortOption; // For sorting by price
+  String? selectedSortOption;
 
   late Future<List<Map<String, dynamic>>> fetchedCountries;
   late Future<List<String>> futureCities;
@@ -52,13 +52,11 @@ class _CarSearchPageState extends State<CarSearchPage> {
 
   Future<List<String>> fetchCitiesWithCars() async {
     final url = Uri.parse('${Config.BASE_URL}/getCitiesHaveCars');
-
     try {
       final response = await http.get(url);
-
       if (response.statusCode == 200) {
         List<dynamic> data = json.decode(response.body);
-        return data.cast<String>(); // Convert to list of String
+        return data.cast<String>();
       } else {
         throw Exception('خطأ في تحميل المدن');
       }
@@ -70,15 +68,10 @@ class _CarSearchPageState extends State<CarSearchPage> {
   Future<List<Map<String, dynamic>>> fetchCountries() async {
     try {
       final response = await http.get(Uri.parse('${Config.BASE_URL}/countries'));
-
       if (response.statusCode == 200) {
         List<dynamic> countriesFromServer = json.decode(response.body);
-
         return countriesFromServer.map((country) {
-          return {
-            "id": country["id"], // ✅ استرجاع الـ ID
-            "name": country["name_en"] // ✅ اسم البلد بالعربية
-          };
+          return {"id": country["id"], "name": country["name_en"]};
         }).toList();
       } else {
         print("خطأ في الخادم: ${response.statusCode}");
@@ -106,22 +99,16 @@ class _CarSearchPageState extends State<CarSearchPage> {
     });
 
     try {
-      print("جاري المحاولة...");
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
         body: body,
       );
-
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        print(responseData);
         setState(() {
-          cars = (responseData['data'] as List)
-              .map((carJson) => CarModel.fromJson(carJson)) // استخدام طريقة fromJson المحدثة
-              .toList();
-          sortCars(); // ترتيب السيارات بعد جلبها
-          print(cars);
+          cars = (responseData['data'] as List).map((carJson) => CarModel.fromJson(carJson)).toList();
+          sortCars();
         });
       } else {
         throw Exception('فشل في تحميل السيارات: ${response.statusCode}');
@@ -137,7 +124,6 @@ class _CarSearchPageState extends State<CarSearchPage> {
   Future<List<String>> fetchCities(int countryId) async {
     try {
       final response = await http.get(Uri.parse("${Config.BASE_URL}/countries/$countryId/cities"));
-
       if (response.statusCode == 200) {
         List<dynamic> citiesFromServer = json.decode(response.body);
         return citiesFromServer.map((city) => city["name_en"].toString()).toList();
@@ -155,7 +141,6 @@ class _CarSearchPageState extends State<CarSearchPage> {
     if (_pickupDateController.text.isNotEmpty && _returnDateController.text.isNotEmpty) {
       DateTime pickupDate = DateTime.parse(_pickupDateController.text);
       DateTime returnDate = DateTime.parse(_returnDateController.text);
-
       setState(() {
         numberOfDays = returnDate.difference(pickupDate).inDays;
       });
@@ -168,6 +153,24 @@ class _CarSearchPageState extends State<CarSearchPage> {
     } else if (selectedSortOption == 'السعر: من الأعلى إلى الأقل') {
       cars.sort((a, b) => b.pricePerDay.compareTo(a.pricePerDay));
     }
+  }
+
+  // Méthode pour gérer l'actualisation
+  Future<void> _refreshPage() async {
+    setState(() {
+      selectedCountry = null;
+      selectedCity = null;
+      cities = [];
+      cars = [];
+      _pickupDateController.clear();
+      _returnDateController.clear();
+      numberOfDays = 0;
+      selectedSortOption = null;
+      fetchedCountries = fetchCountries(); // Recharger les pays
+      futureCities = fetchCitiesWithCars(); // Recharger les villes
+    });
+    // Optionnel : Si vous voulez relancer une recherche automatiquement
+    // await searchCars();
   }
 
   @override
@@ -193,157 +196,160 @@ class _CarSearchPageState extends State<CarSearchPage> {
       ),
       body: Stack(
         children: [
-          // المحتوى الرئيسي مع SingleChildScrollView
-          SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Card(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    elevation: 4,
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          FutureBuilder<List<Map<String, dynamic>>>(
-                            future: fetchCountries(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return CircularProgressIndicator();
-                              } else if (snapshot.hasError) {
-                                return Text("خطأ في تحميل البلدان");
-                              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                                return Text("لا توجد بلدان متاحة");
-                              }
+          RefreshIndicator(
+            onRefresh: _refreshPage, // Appeler la méthode d'actualisation
+            child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(), // Nécessaire pour activer le pull-to-refresh
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Card(
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      elevation: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          children: [
+                            FutureBuilder<List<Map<String, dynamic>>>(
+                              future: fetchCountries(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState == ConnectionState.waiting) {
+                                  return CircularProgressIndicator();
+                                } else if (snapshot.hasError) {
+                                  return Text("خطأ في تحميل البلدان");
+                                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                  return Text("لا توجد بلدان متاحة");
+                                }
 
-                              List<Map<String, dynamic>> countries = snapshot.data!;
-
-                              return DropdownButtonFormField<int>(
-                                value: selectedCountry != null ? int.tryParse(selectedCountry!) : null,
-                                items: countries.map((country) {
-                                  return DropdownMenuItem<int>(
-                                    value: country["id"],
-                                    child: Text(country["name"]),
+                                List<Map<String, dynamic>> countries = snapshot.data!;
+                                return DropdownButtonFormField<int>(
+                                  value: selectedCountry != null ? int.tryParse(selectedCountry!) : null,
+                                  items: countries.map((country) {
+                                    return DropdownMenuItem<int>(
+                                      value: country["id"],
+                                      child: Text(country["name"]),
+                                    );
+                                  }).toList(),
+                                  onChanged: (value) async {
+                                    setState(() {
+                                      selectedCountry = value.toString();
+                                      selectedCity = null;
+                                      cities = [];
+                                    });
+                                    List<String> fetchedCities = await fetchCities(value!);
+                                    setState(() {
+                                      cities = fetchedCities;
+                                    });
+                                  },
+                                  decoration: InputDecoration(labelText: "اختر البلد"),
+                                );
+                              },
+                            ),
+                            if (cities.isNotEmpty)
+                              DropdownButtonFormField<String>(
+                                value: selectedCity,
+                                items: cities.map((String city) {
+                                  return DropdownMenuItem<String>(
+                                    value: city,
+                                    child: Text(city),
                                   );
                                 }).toList(),
-                                onChanged: (value) async {
+                                onChanged: (value) {
                                   setState(() {
-                                    selectedCountry = value.toString();
-                                    selectedCity = null;
-                                    cities = [];
-                                  });
-
-                                  List<String> fetchedCities = await fetchCities(value!);
-                                  setState(() {
-                                    cities = fetchedCities;
+                                    selectedCity = value;
                                   });
                                 },
-                                decoration: InputDecoration(labelText: "اختر البلد"),
-                              );
-                            },
-                          ),
-
-                          if (cities.isNotEmpty)
-                            DropdownButtonFormField<String>(
-                              value: selectedCity,
-                              items: cities.map((String city) {
-                                return DropdownMenuItem<String>(
-                                  value: city,
-                                  child: Text(city),
-                                );
-                              }).toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedCity = value;
-                                });
+                                decoration: InputDecoration(labelText: "موقع الاستلام"),
+                              ),
+                            TextField(
+                              controller: _pickupDateController,
+                              decoration: InputDecoration(labelText: "تاريخ الاستلام"),
+                              readOnly: true,
+                              onTap: () async {
+                                DateTime? pickedDateTime = await showDateTimePicker();
+                                if (pickedDateTime != null) {
+                                  setState(() {
+                                    _pickupDateController.text = "${pickedDateTime.toLocal()}".split('.')[0];
+                                    calculateDaysDifference();
+                                  });
+                                }
                               },
-                              decoration: InputDecoration(labelText: "موقع الاستلام"),
                             ),
-
-                          TextField(
-                            controller: _pickupDateController,
-                            decoration: InputDecoration(labelText: "تاريخ الاستلام"),
-                            readOnly: true,
-                            onTap: () async {
-                              DateTime? pickedDateTime = await showDateTimePicker();
-                              if (pickedDateTime != null) {
-                                setState(() {
-                                  _pickupDateController.text = "${pickedDateTime.toLocal()}".split('.')[0];
-                                  calculateDaysDifference();
-                                });
-                              }
-                            },
-                          ),
-                          TextField(
-                            controller: _returnDateController,
-                            decoration: InputDecoration(labelText: "تاريخ التسليم"),
-                            readOnly: true,
-                            onTap: () async {
-                              DateTime? pickedDateTime = await showDateTimePicker();
-                              if (pickedDateTime != null) {
-                                setState(() {
-                                  _returnDateController.text = "${pickedDateTime.toLocal()}".split('.')[0];
-                                  calculateDaysDifference();
-                                });
-                              }
-                            },
-                          ),
-                          SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: searchCars,
-                            child: Text("بحث"),
-                            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                          )
-                        ],
+                            TextField(
+                              controller: _returnDateController,
+                              decoration: InputDecoration(labelText: "تاريخ التسليم"),
+                              readOnly: true,
+                              onTap: () async {
+                                DateTime? pickedDateTime = await showDateTimePicker();
+                                if (pickedDateTime != null) {
+                                  setState(() {
+                                    _returnDateController.text = "${pickedDateTime.toLocal()}".split('.')[0];
+                                    calculateDaysDifference();
+                                  });
+                                }
+                              },
+                            ),
+                            SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: searchCars,
+                              child: Text("بحث"),
+                              style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 16),
-                  // Dropdown للترتيب حسب السعر
-                  DropdownButton<String>(
-                    value: selectedSortOption,
-                    hint: Text("ترتيب حسب السعر"),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        selectedSortOption = newValue;
-                        sortCars(); // ترتيب السيارات عند اختيار الخيار
-                      });
-                    },
-                    items: <String>['السعر: من الأقل إلى الأعلى', 'السعر: من الأعلى إلى الأقل']
-                        .map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  ),
-                  SizedBox(height: 16),
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                      childAspectRatio: 0.7,
+                    SizedBox(height: 16),
+                    DropdownButton<String>(
+                      value: selectedSortOption,
+                      hint: Text("ترتيب حسب السعر"),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          selectedSortOption = newValue;
+                          sortCars();
+                        });
+                      },
+                      items: <String>['السعر: من الأقل إلى الأعلى', 'السعر: من الأعلى إلى الأقل']
+                          .map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
                     ),
-                    itemCount: cars.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => CarDetailsPage(car: cars[index], date_debut: _pickupDateController.text, date_fin: _returnDateController.text, numberOfDays: numberOfDays),
-                            ),
-                          );
-                        },
-                        child: CarCardItem(car: cars[index]),
-                      );
-                    },
-                  ),
-                ],
+                    SizedBox(height: 16),
+                    GridView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                        childAspectRatio: 0.7,
+                      ),
+                      itemCount: cars.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CarDetailsPage(
+                                  car: cars[index],
+                                  date_debut: _pickupDateController.text,
+                                  date_fin: _returnDateController.text,
+                                  numberOfDays: numberOfDays,
+                                ),
+                              ),
+                            );
+                          },
+                          child: CarCardItem(car: cars[index]),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -362,8 +368,8 @@ class _CarSearchPageState extends State<CarSearchPage> {
               );
             });
           },
-          label: Text("الخريطة" ,style: TextStyle(color: Colors.white),),
-          icon: Icon(Icons.map,color: Colors.white,),
+          label: Text("الخريطة", style: TextStyle(color: Colors.white)),
+          icon: Icon(Icons.map, color: Colors.white),
           backgroundColor: Color.fromRGBO(0, 150, 55, 1.0),
         ),
       ),

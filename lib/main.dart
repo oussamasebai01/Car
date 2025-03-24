@@ -11,6 +11,7 @@ import 'package:car/screens/institutions/Profile.dart';
 import 'package:car/screens/institutions/bookingRequest.dart';
 import 'package:car/screens/institutions/my_car/car_liste.dart';
 import 'package:car/screens/institutions/rejectedList.dart';
+import 'package:car/utils/config.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
@@ -136,7 +137,7 @@ class NotificationService {
     final prefs = await SharedPreferences.getInstance();
     final storedInstitutionId = prefs.getInt('id');
 
-    socket = IO.io('http://10.0.2.2:3000', <String, dynamic>{
+    socket = IO.io('${Config.BASE_URL_NOTIF}', <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': true,
     });

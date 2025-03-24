@@ -17,14 +17,18 @@ class _BookingListScreenState extends State<BookingListScreen> {
   @override
   void initState() {
     super.initState();
+    _loadBookings();
+  }
+
+  // Function to load tenant bookings
+  void _loadBookings() {
     futureBookings = fetchTenantBookings();
   }
 
   // Function to fetch tenant bookings from the API
   Future<List<Booking>> fetchTenantBookings() async {
-    // Retrieve the authentication token from shared preferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token'); // Replace 'auth_token' with your key
+    String? token = prefs.getString('auth_token');
 
     if (token == null) {
       throw Exception('المستخدم غير مسجل الدخول');
@@ -33,7 +37,7 @@ class _BookingListScreenState extends State<BookingListScreen> {
     final response = await http.get(
       Uri.parse('${Config.BASE_URL}/institution-tenant'),
       headers: {
-        'Authorization': 'Bearer $token', // Include the token in the headers
+        'Authorization': 'Bearer $token',
         'Accept': 'application/json',
       },
     );
@@ -69,10 +73,9 @@ class _BookingListScreenState extends State<BookingListScreen> {
     print('Status Code: ${response.statusCode}');
     print('Response Body: ${response.body}');
 
-    if (response.statusCode == 200) { // Check for status code 200
-      // Refresh the list after finishing the booking
+    if (response.statusCode == 200) {
       setState(() {
-        futureBookings = fetchTenantBookings(); // Refresh the list
+        _loadBookings(); // Refresh the list
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('تم إنهاء الحجز بنجاح')),
@@ -86,16 +89,15 @@ class _BookingListScreenState extends State<BookingListScreen> {
 
   // Function to handle cancel booking action
   Future<void> cancelBooking(int bookingId) async {
-    // Show a dialog to get the cancellation description
     String? description = await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
-        String inputValue = ''; // Variable to store the user's input
+        String inputValue = '';
         return AlertDialog(
           title: Text('إلغاء الحجز'),
           content: TextField(
             onChanged: (value) {
-              inputValue = value; // Update the input value as the user types
+              inputValue = value;
             },
             decoration: InputDecoration(
               hintText: 'أدخل سبب الإلغاء',
@@ -105,13 +107,13 @@ class _BookingListScreenState extends State<BookingListScreen> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context); // Close the dialog without saving
+                Navigator.pop(context);
               },
               child: Text('إلغاء'),
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context, inputValue); // Close the dialog and return the input value
+                Navigator.pop(context, inputValue);
               },
               child: Text('إرسال'),
             ),
@@ -120,7 +122,6 @@ class _BookingListScreenState extends State<BookingListScreen> {
       },
     );
 
-    // If the user cancels the dialog or doesn't provide a description, do nothing
     if (description == null || description.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('سبب الإلغاء مطلوب')),
@@ -138,26 +139,24 @@ class _BookingListScreenState extends State<BookingListScreen> {
       return;
     }
 
-    // Send the cancellation request with the description
     final response = await http.post(
       Uri.parse('${Config.BASE_URL}/cancel-tenant/$bookingId'),
       headers: {
         'Authorization': 'Bearer $token',
         'Accept': 'application/json',
-        'Content-Type': 'application/json', // Add this header for JSON data
+        'Content-Type': 'application/json',
       },
       body: jsonEncode({
-        'description': description, // Include the description in the request body
+        'description': description,
       }),
     );
 
     print('Status Code: ${response.statusCode}');
     print('Response Body: ${response.body}');
 
-    if (response.statusCode == 200) { // Check for status code 200
-      // Refresh the list after canceling the booking
+    if (response.statusCode == 200) {
       setState(() {
-        futureBookings = fetchTenantBookings(); // Refresh the list
+        _loadBookings(); // Refresh the list
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('تم إلغاء الحجز بنجاح')),
@@ -169,16 +168,23 @@ class _BookingListScreenState extends State<BookingListScreen> {
     }
   }
 
+  // Function to handle list refresh
+  Future<void> _refreshList() async {
+    setState(() {
+      _expandedCards.clear(); // Reset expanded state of cards
+      _loadBookings(); // Reload the bookings
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('قائمة الحجوزات', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.green, // Green theme for the app bar
+        backgroundColor: Colors.green,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white), // Custom back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            // Navigate to /dashboardinstitution
             Navigator.pushReplacementNamed(context, '/dashboardinstitution');
           },
         ),
@@ -194,106 +200,110 @@ class _BookingListScreenState extends State<BookingListScreen> {
             return Center(child: Text('لا توجد حجوزات للمستأجرين.', style: TextStyle(color: Colors.grey)));
           } else {
             List<Booking> bookings = snapshot.data!;
-            return ListView.builder(
-              itemCount: bookings.length,
-              itemBuilder: (context, index) {
-                Booking booking = bookings[index];
-                bool isExpanded = _expandedCards[booking.id] ?? false;
+            return RefreshIndicator(
+              onRefresh: _refreshList, // Call the refresh method for the list
+              child: ListView.builder(
+                physics: AlwaysScrollableScrollPhysics(), // Ensure scroll is always enabled
+                itemCount: bookings.length,
+                itemBuilder: (context, index) {
+                  Booking booking = bookings[index];
+                  bool isExpanded = _expandedCards[booking.id] ?? false;
 
-                return Card(
-                  margin: EdgeInsets.all(8.0),
-                  elevation: 4, // Add shadow for a modern look
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12), // Rounded corners
-                  ),
-                  child: ExpansionTile(
-                    title: Text(
-                      '${booking.firstName} ${booking.middleName ?? ''} ${booking.lastName}',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green, // Green text for the title
-                      ),
+                  return Card(
+                    margin: EdgeInsets.all(8.0),
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    leading: Icon(Icons.person, color: Colors.green), // Add an icon
-                    initiallyExpanded: isExpanded,
-                    onExpansionChanged: (expanded) {
-                      setState(() {
-                        _expandedCards[booking.id] = expanded;
-                      });
-                    },
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildDetailRow(Icons.phone, 'الهاتف: ${booking.phoneNumber}'),
-                            if (booking.whatsappNumber != null)
-                              _buildDetailRow(Icons.phone_android, 'واتساب: ${booking.whatsappNumber}'),
-                            _buildDetailRow(Icons.location_on, 'العنوان: ${booking.street}, ${booking.buildingNumber}'),
-                            if (booking.nearestLocation != null)
-                              _buildDetailRow(Icons.location_on, 'أقرب موقع: ${booking.nearestLocation}'),
-                            SizedBox(height: 10),
-                            Text('رخصة القيادة:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
-                            SizedBox(height: 5),
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8), // Rounded corners for the image
-                              child: Image.network(
-                                booking.driverLicense,
-                                width: double.infinity,
-                                height: 150,
-                                fit: BoxFit.cover,
-                                loadingBuilder: (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return Center(child: CircularProgressIndicator(color: Colors.green));
-                                },
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Center(child: Icon(Icons.error, color: Colors.red));
-                                },
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                            _buildDetailRow(Icons.payment, 'طريقة الدفع: ${booking.paymentMethod}'),
-                            _buildDetailRow(Icons.attach_money, 'السعر الإجمالي: \$${booking.totalPrice.toStringAsFixed(2)}'),
-                            _buildDetailRow(Icons.calendar_today, 'تاريخ الإيجار: ${booking.rentDate.toLocal()}'),
-                            _buildDetailRow(Icons.calendar_today, 'تاريخ الإرجاع: ${booking.returnDate.toLocal()}'),
-                            SizedBox(height: 10),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                ElevatedButton(
-                                  onPressed: () => finishBooking(booking.id),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green, // Green color for finish
-                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8), // Rounded corners for the button
-                                    ),
-                                  ),
-                                  child: Text('إنهاء الحجز', style: TextStyle(color: Colors.white)),
-                                ),
-                                SizedBox(width: 10), // Add spacing between buttons
-                                ElevatedButton(
-                                  onPressed: () => cancelBooking(booking.id),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red, // Red color for cancel
-                                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8), // Rounded corners for the button
-                                    ),
-                                  ),
-                                  child: Text('إلغاء الحجز', style: TextStyle(color: Colors.white)),
-                                ),
-                              ],
-                            ),
-                          ],
+                    child: ExpansionTile(
+                      title: Text(
+                        '${booking.firstName} ${booking.middleName ?? ''} ${booking.lastName}',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
                         ),
                       ),
-                    ],
-                  ),
-                );
-              },
+                      leading: Icon(Icons.person, color: Colors.green),
+                      initiallyExpanded: isExpanded,
+                      onExpansionChanged: (expanded) {
+                        setState(() {
+                          _expandedCards[booking.id] = expanded;
+                        });
+                      },
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildDetailRow(Icons.phone, 'الهاتف: ${booking.phoneNumber}'),
+                              if (booking.whatsappNumber != null)
+                                _buildDetailRow(Icons.phone_android, 'واتساب: ${booking.whatsappNumber}'),
+                              _buildDetailRow(Icons.location_on, 'العنوان: ${booking.street}, ${booking.buildingNumber}'),
+                              if (booking.nearestLocation != null)
+                                _buildDetailRow(Icons.location_on, 'أقرب موقع: ${booking.nearestLocation}'),
+                              SizedBox(height: 10),
+                              Text('رخصة القيادة:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+                              SizedBox(height: 5),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.network(
+                                  booking.driverLicense,
+                                  width: double.infinity,
+                                  height: 150,
+                                  fit: BoxFit.cover,
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Center(child: CircularProgressIndicator(color: Colors.green));
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Center(child: Icon(Icons.error, color: Colors.red));
+                                  },
+                                ),
+                              ),
+                              SizedBox(height: 10),
+                              _buildDetailRow(Icons.payment, 'طريقة الدفع: ${booking.paymentMethod}'),
+                              _buildDetailRow(Icons.attach_money, 'السعر الإجمالي: \$${booking.totalPrice.toStringAsFixed(2)}'),
+                              _buildDetailRow(Icons.calendar_today, 'تاريخ الإيجار: ${booking.rentDate.toLocal()}'),
+                              _buildDetailRow(Icons.calendar_today, 'تاريخ الإرجاع: ${booking.returnDate.toLocal()}'),
+                              SizedBox(height: 10),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () => finishBooking(booking.id),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text('إنهاء الحجز', style: TextStyle(color: Colors.white)),
+                                  ),
+                                  SizedBox(width: 10),
+                                  ElevatedButton(
+                                    onPressed: () => cancelBooking(booking.id),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    child: Text('إلغاء الحجز', style: TextStyle(color: Colors.white)),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             );
           }
         },
