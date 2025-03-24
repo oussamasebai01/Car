@@ -1,13 +1,46 @@
 import 'package:flutter/material.dart';
 import 'models/car_model.dart';
 
-class CarCardItem extends StatelessWidget {
+class CarCardItem extends StatefulWidget {
   final CarModel car;
 
-  const CarCardItem({required this.car});
-
+   CarCardItem({Key? key, required this.car}) : super(key: key)
+   {}
   @override
+  _CarCardItemState createState() => _CarCardItemState();
+}
+class _CarCardItemState extends State<CarCardItem> {
+  // Fonction pour générer l'URL de l'image
+  String createCarImage(CarModel car, String angle, String color) {
+    // Base API URL for generating car images
+    final url = Uri.https("cdn.imagin.studio", "/getimage");
+
+    // Destructure the necessary properties from the car object
+    final manuYear = car.manu_year;
+    final modelName = car.modelName; // Get the model name in English
+    final manufacturerName = car.manufacturerName; // Get the manufacturer name
+
+    // Append query parameters for the API request
+    final params = {
+      "customer": "img", // API key
+      "zoomType": "relative", // Zoom type
+      "paintdescription": color, // Example color
+      "modelFamily": modelName.split(" ")[0], // First word of the model name
+      "make": manufacturerName, // Car make
+      "modelYear": "$manuYear", // Manufacturing year
+      "angle": angle, // Car angle
+      "width": "800",
+    };
+
+    // Return the constructed URL as a string
+    return url.replace(queryParameters: params).toString();
+  }
+
+
+@override
   Widget build(BuildContext context) {
+  // Générer l'URL de l'image
+  final imageUrl = createCarImage(widget.car, "03", widget.car.carColor);
     return Card(
       elevation: 4, // Ombre pour un effet visuel
       shape: RoundedRectangleBorder(
@@ -19,11 +52,26 @@ class CarCardItem extends StatelessWidget {
           // Image par défaut
           ClipRRect(
             borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
-            child: Image.asset(
-              "assets/bmw_x5.png", // Image par défaut
-              fit: BoxFit.cover,
-              width: double.infinity,
-              height: 90, // Hauteur de l'image
+            child: FutureBuilder(
+              future: precacheImage(NetworkImage(imageUrl), context),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  // Si l'image est chargée, l'afficher
+                  return Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    width: double.infinity,
+                    height: 90, // Limite l'image à 40% de la carte
+                  );
+                } else {
+                  // Pendant le chargement, afficher un indicateur de progression
+                  return Container(
+                    height: 90,
+                    color: Colors.grey[300],
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+              },
             ),
           ),
           // Contenu de la carte
@@ -34,7 +82,7 @@ class CarCardItem extends StatelessWidget {
               children: [
                 // Nom du modèle et fabricant
                 Text(
-                  car.modelName!,
+                  widget.car.modelName!,
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -42,7 +90,7 @@ class CarCardItem extends StatelessWidget {
                 ),
                 SizedBox(height: 4),
                 Text(
-                  car.manufacturerName!,
+                  widget.car.manufacturerName!,
                   style: TextStyle(
                     fontSize: 16,
                     color: Colors.grey[600],
@@ -55,7 +103,7 @@ class CarCardItem extends StatelessWidget {
                     Icon(Icons.attach_money, color: Colors.green, size: 20),
                     SizedBox(width: 8),
                     Text(
-                      "\$${car.pricePerDay}/day",
+                      "\$${widget.car.pricePerDay}/day",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -74,7 +122,7 @@ class CarCardItem extends StatelessWidget {
                         Icon(Icons.people, color: Colors.grey[600], size: 20),
                         SizedBox(width: 8),
                         Text(
-                          "${car.seatNumber} seats",
+                          "${widget.car.seatNumber} seats",
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],

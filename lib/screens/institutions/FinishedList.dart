@@ -17,14 +17,18 @@ class _FinishedScreenState extends State<FinishedScreen> {
   @override
   void initState() {
     super.initState();
+    _loadFinishedClients();
+  }
+
+  // Function to load finished clients
+  void _loadFinishedClients() {
     futureFinishedClients = fetchFinishedClients();
   }
 
   // Function to fetch finished clients from the API
   Future<List<Finished>> fetchFinishedClients() async {
-    // Retrieve the authentication token from shared preferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString('auth_token'); // Replace 'auth_token' with your key
+    String? token = prefs.getString('auth_token');
 
     if (token == null) {
       throw Exception('المستخدم غير مسجل الدخول');
@@ -39,13 +43,8 @@ class _FinishedScreenState extends State<FinishedScreen> {
     );
 
     if (response.statusCode == 200) {
-      // Parse the response as a JSON object
       Map<String, dynamic> responseBody = jsonDecode(response.body);
-
-      // Extract the list of bookings from the 'data' field
       List<dynamic> data = responseBody['data'];
-
-      // Map the list of JSON objects to a list of Finished objects
       List<Finished> finishedClients = data.map((dynamic item) => Finished.fromJson(item)).toList();
       return finishedClients;
     } else {
@@ -53,16 +52,23 @@ class _FinishedScreenState extends State<FinishedScreen> {
     }
   }
 
+  // Function to handle list refresh
+  Future<void> _refreshList() async {
+    setState(() {
+      _expandedCards.clear(); // Reset expanded state of cards
+      _loadFinishedClients(); // Reload the finished clients
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('الحجوزات المنتهية', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.green, // Green theme for the app bar
+        backgroundColor: Colors.green,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white), // Custom back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            // Navigate to /DashboardInstitution
             Navigator.pushReplacementNamed(context, '/dashboardinstitution');
           },
         ),
@@ -78,77 +84,80 @@ class _FinishedScreenState extends State<FinishedScreen> {
             return Center(child: Text('لا توجد حجوزات منتهية.', style: TextStyle(color: Colors.grey)));
           } else {
             List<Finished> finishedClients = snapshot.data!;
-            return ListView.builder(
-              itemCount: finishedClients.length,
-              itemBuilder: (context, index) {
-                Finished finished = finishedClients[index];
-                bool isExpanded = _expandedCards[finished.id] ?? false;
+            return RefreshIndicator(
+              onRefresh: _refreshList, // Call the refresh method for the list
+              child: ListView.builder(
+                physics: AlwaysScrollableScrollPhysics(), // Ensure scroll is always enabled
+                itemCount: finishedClients.length,
+                itemBuilder: (context, index) {
+                  Finished finished = finishedClients[index];
+                  bool isExpanded = _expandedCards[finished.id] ?? false;
 
-                return Card(
-                  margin: EdgeInsets.all(8.0),
-                  elevation: 4, // Add shadow for a modern look
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12), // Rounded corners
-                  ),
-                  child: ExpansionTile(
-                    title: Text(
-                      '${finished.firstName} ${finished.middleName} ${finished.lastName}',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black, // Black text for the title
-                      ),
+                  return Card(
+                    margin: EdgeInsets.all(8.0),
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                    leading: Icon(Icons.person, color: Colors.green), // Add an icon
-                    initiallyExpanded: isExpanded,
-                    onExpansionChanged: (expanded) {
-                      setState(() {
-                        _expandedCards[finished.id] = expanded;
-                      });
-                    },
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            _buildDetailRow(Icons.email, 'البريد الإلكتروني: ${finished.email}'),
-                            _buildDetailRow(Icons.phone, 'الهاتف: ${finished.phoneNumber}'),
-                            _buildDetailRow(Icons.phone_android, 'واتساب: ${finished.whatsappNumber}'),
-                            _buildDetailRow(Icons.location_on, 'العنوان: ${finished.street}, ${finished.buildingNumber}, ${finished.nearestLocation}'),
-                            SizedBox(height: 10),
-                            Text('رخصة القيادة:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
-                            SizedBox(height: 5),
-                            if (finished.driverLicense != null)
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8), // Rounded corners for the image
-                                child: Image.network(
-                                  finished.driverLicense,
-                                  width: double.infinity,
-                                  height: 150,
-                                  fit: BoxFit.cover,
-                                  loadingBuilder: (context, child, loadingProgress) {
-                                    if (loadingProgress == null) return child;
-                                    return Center(child: CircularProgressIndicator(color: Colors.green));
-                                  },
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Center(child: Icon(Icons.error, color: Colors.red));
-                                  },
-                                ),
-                              ),
-                            SizedBox(height: 10),
-                            _buildDetailRow(Icons.payment, 'طريقة الدفع: ${finished.paymentMethod}'),
-                            _buildDetailRow(Icons.attach_money, 'السعر الإجمالي: \$${finished.totalPrice.toStringAsFixed(2)}'),
-                            _buildDetailRow(Icons.calendar_today, 'تاريخ الإيجار: ${finished.rentDate}'),
-                            _buildDetailRow(Icons.calendar_today, 'تاريخ الإرجاع: ${finished.returnDate}'),
-                            _buildDetailRow(Icons.description, 'الوصف: ${finished.description}'), // Added description
-                          ],
+                    child: ExpansionTile(
+                      title: Text(
+                        '${finished.firstName} ${finished.middleName} ${finished.lastName}',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
                         ),
                       ),
-                    ],
-                  ),
-                );
-              },
+                      leading: Icon(Icons.person, color: Colors.green),
+                      initiallyExpanded: isExpanded,
+                      onExpansionChanged: (expanded) {
+                        setState(() {
+                          _expandedCards[finished.id] = expanded;
+                        });
+                      },
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _buildDetailRow(Icons.phone, 'الهاتف: ${finished.phoneNumber}'),
+                              _buildDetailRow(Icons.phone_android, 'واتساب: ${finished.whatsappNumber}'),
+                              _buildDetailRow(Icons.location_on, 'العنوان: ${finished.street}, ${finished.buildingNumber}, ${finished.nearestLocation}'),
+                              SizedBox(height: 10),
+                              Text('رخصة القيادة:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+                              SizedBox(height: 5),
+                              if (finished.driverLicense != null)
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    finished.driverLicense,
+                                    width: double.infinity,
+                                    height: 150,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder: (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(child: CircularProgressIndicator(color: Colors.green));
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Center(child: Icon(Icons.error, color: Colors.red));
+                                    },
+                                  ),
+                                ),
+                              SizedBox(height: 10),
+                              _buildDetailRow(Icons.payment, 'طريقة الدفع: ${finished.paymentMethod}'),
+                              _buildDetailRow(Icons.attach_money, 'السعر الإجمالي: \$${finished.totalPrice.toStringAsFixed(2)}'),
+                              _buildDetailRow(Icons.calendar_today, 'تاريخ الإيجار: ${finished.rentDate}'),
+                              _buildDetailRow(Icons.calendar_today, 'تاريخ الإرجاع: ${finished.returnDate}'),
+                              _buildDetailRow(Icons.description, 'الوصف: ${finished.description}'),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             );
           }
         },

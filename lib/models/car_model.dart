@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import '../bookingCar.dart';
+import '../carCardItem.dart';
 class CarModel {
 final int id;
 final String tagNumber;
@@ -97,9 +98,34 @@ class CarDetailsPage extends StatelessWidget {
       {required this.car, required this.numberOfDays, required this.date_debut, required this.date_fin});
 
   late String prix_total = (numberOfDays * car.pricePerDay).toString();
+  String createCarImage(CarModel car, String angle, String color) {
+    // Base API URL for generating car images
+    final url = Uri.https("cdn.imagin.studio", "/getimage");
+
+    // Destructure the necessary properties from the car object
+    final manuYear = car.manu_year;
+    final modelName = car.modelName; // Get the model name in English
+    final manufacturerName = car.manufacturerName; // Get the manufacturer name
+
+    // Append query parameters for the API request
+    final params = {
+      "customer": "img", // API key
+      "zoomType": "relative", // Zoom type
+      "paintdescription": color, // Example color
+      "modelFamily": modelName.split(" ")[0], // First word of the model name
+      "make": manufacturerName, // Car make
+      "modelYear": "$manuYear", // Manufacturing year
+      "angle": angle, // Car angle
+      "width": "800",
+    };
+
+    // Return the constructed URL as a string
+    return url.replace(queryParameters: params).toString();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final imageUrl = createCarImage(car, "03", car.carColor);
     return Scaffold(
       appBar: AppBar(
         title: Text(car.modelName), // استخدام car.modelName كعنوان
@@ -113,12 +139,27 @@ class CarDetailsPage extends StatelessWidget {
           children: [
             // الصورة الافتراضية
             ClipRRect(
-              borderRadius: BorderRadius.circular(12), // حواف مدورة
-              child: Image.asset(
-                "assets/bmw_x5.png", // الصورة الافتراضية
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: 200, // ارتفاع الصورة
+              borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+              child: FutureBuilder(
+                future: precacheImage(NetworkImage(imageUrl), context),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    // Si l'image est chargée, l'afficher
+                    return Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: 150, // Limite l'image à 40% de la carte
+                    );
+                  } else {
+                    // Pendant le chargement, afficher un indicateur de progression
+                    return Container(
+                      height: 90,
+                      color: Colors.grey[300],
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                },
               ),
             ),
             SizedBox(height: 16),
@@ -272,7 +313,8 @@ class CarDetailsPage extends StatelessWidget {
                               date_debut: date_debut,
                               date_fin: date_fin,
                               prix_total: prix_total,
-                              id: car.id),
+                              id: car.id,
+                              car: car,),
                     ),
                   );
                 },

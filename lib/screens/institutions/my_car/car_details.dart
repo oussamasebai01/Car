@@ -4,17 +4,41 @@ import 'package:flutter/material.dart';
 import '../../../models/car_model.dart';
 import 'add_car.dart';
 
-// ignore: must_be_immutable
 class CarDetailsPageI extends StatelessWidget {
   final CarModel car;
 
   CarDetailsPageI({required this.car});
 
+  // دالة لإنشاء رابط صورة السيارة
+  String createCarImage(CarModel car, String angle, String color) {
+    final url = Uri.https("cdn.imagin.studio", "/getimage");
+
+    final manuYear = car.manu_year;
+    final modelName = car.modelName; // اسم الموديل
+    final manufacturerName = car.manufacturerName; // اسم الصانع
+
+    final params = {
+      "customer": "img", // مفتاح API
+      "zoomType": "relative", // نوع التكبير
+      "paintdescription": color, // لون السيارة
+      "modelFamily": modelName.split(" ")[0], // أول كلمة من اسم الموديل
+      "make": manufacturerName, // الصانع
+      "modelYear": "$manuYear", // سنة التصنيع
+      "angle": angle, // زاوية الصورة
+      "width": "800", // عرض الصورة
+    };
+
+    return url.replace(queryParameters: params).toString();
+  }
+
   @override
   Widget build(BuildContext context) {
+    // إنشاء رابط الصورة
+    final imageUrl = createCarImage(car, "03", car.carColor);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(car.modelName!), // استخدام car.modelName كعنوان
+        title: Text(car.modelName!), // استخدام اسم الموديل كعنوان
         backgroundColor: Colors.green, // لون خلفية AppBar
         elevation: 0, // إزالة الظل
       ),
@@ -23,22 +47,37 @@ class CarDetailsPageI extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // صورة افتراضية
+            // صورة السيارة الديناميكية
             ClipRRect(
               borderRadius: BorderRadius.circular(12), // حواف مدورة
-              child: Image.asset(
-                "assets/bmw_x5.png", // صورة افتراضية
-                fit: BoxFit.cover,
-                width: double.infinity,
-                height: 200, // ارتفاع الصورة
+              child: FutureBuilder(
+                future: precacheImage(NetworkImage(imageUrl), context),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    // إذا تم تحميل الصورة، عرضها
+                    return Image.network(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: 200, // ارتفاع الصورة
+                    );
+                  } else {
+                    // أثناء التحميل، عرض مؤشر تقدم
+                    return Container(
+                      height: 200,
+                      color: Colors.grey[300],
+                      child: Center(child: CircularProgressIndicator()),
+                    );
+                  }
+                },
               ),
             ),
             SizedBox(height: 16),
 
-            // السعر الإجمالي والسعر اليومي
+            // السعر اليومي
             Row(
               children: [
-                Spacer(), // دفع النص الثاني إلى أقصى اليمين
+                Spacer(), // دفع النص إلى اليمين
                 Text(
                   '\$${car.pricePerDay}/يوم', // السعر اليومي
                   style: TextStyle(fontSize: 16, color: Colors.grey),
@@ -84,7 +123,8 @@ class CarDetailsPageI extends StatelessWidget {
                             size: 24,
                             color: Colors.green,
                           ),
-                          Text('  ${car.seatNumber}', style: TextStyle(fontSize: 16)),
+                          Text('  ${car.seatNumber}',
+                              style: TextStyle(fontSize: 16)),
                         ],
                       ),
                     ],
@@ -102,7 +142,8 @@ class CarDetailsPageI extends StatelessWidget {
                             size: 24,
                             color: Colors.green,
                           ),
-                          Text(" " + car.gazType!, style: TextStyle(fontSize: 16)),
+                          Text(" " + car.gazType!,
+                              style: TextStyle(fontSize: 16)),
                         ],
                       ),
                     ],
@@ -120,7 +161,8 @@ class CarDetailsPageI extends StatelessWidget {
                             size: 24,
                             color: Colors.green,
                           ),
-                          Text("  " + car.carColor!, style: TextStyle(fontSize: 16)),
+                          Text("  " + car.carColor!,
+                              style: TextStyle(fontSize: 16)),
                         ],
                       ),
                     ],
@@ -147,6 +189,7 @@ class CarDetailsPageI extends StatelessWidget {
 
             SizedBox(height: 16),
 
+            // رقم اللوحة
             Row(
               children: [
                 Icon(
@@ -171,7 +214,8 @@ class CarDetailsPageI extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => AddInstitutionCarScreen(isEdit: true, tempCar: car.toJson()),
+                      builder: (context) =>
+                          AddInstitutionCarScreen(isEdit: true, tempCar: car.toJson()),
                     ),
                   );
                 },

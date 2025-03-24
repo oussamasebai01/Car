@@ -64,9 +64,33 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
   List<CarModel> filteredBookings = [];
   TextEditingController searchController = TextEditingController();
 
+  String createCarImage(CarModel car, String angle, String color) {
+    final url = Uri.https("cdn.imagin.studio", "/getimage");
+    final manuYear = car.manu_year;
+    final modelName = car.modelName;
+    final manufacturerName = car.manufacturerName;
+
+    final params = {
+      "customer": "img",
+      "zoomType": "relative",
+      "paintdescription": color,
+      "modelFamily": modelName.split(" ")[0],
+      "make": manufacturerName,
+      "modelYear": "$manuYear",
+      "angle": angle,
+      "width": "800",
+    };
+
+    return url.replace(queryParameters: params).toString();
+  }
+
   @override
   void initState() {
     super.initState();
+    _loadCars();
+  }
+
+  void _loadCars() {
     futureCars = fetchCars().then((bookings) {
       setState(() {
         filteredBookings = bookings;
@@ -92,12 +116,10 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
     });
   }
 
-  // دالة لحذف حجز عبر API
   Future<void> deleteBooking(int index) async {
     final car = filteredBookings[index];
     final token = await getAuthToken();
 
-    // مربع حوار التأكيد
     final confirmed = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -118,7 +140,6 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
 
     if (confirmed == true) {
       try {
-        // إرسال طلب DELETE إلى API
         final response = await http.delete(
           Uri.parse('${Config.BASE_URL}/delete-institution-cars/${car.id}'),
           headers: {
@@ -127,7 +148,6 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
         );
 
         if (response.statusCode == 200) {
-          // حذف العنصر من القائمة المحلية
           setState(() {
             filteredBookings.removeAt(index);
           });
@@ -138,7 +158,6 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
             ),
           );
         } else {
-          // التعامل مع أخطاء API
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('فشل في حذف ${car.modelName}: ${response.body}'),
@@ -147,7 +166,6 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
           );
         }
       } catch (e) {
-        // التعامل مع أخطاء الاتصال
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('خطأ: ${e.toString()}'),
@@ -156,6 +174,15 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
         );
       }
     }
+  }
+
+  // Méthode pour gérer l'actualisation
+  Future<void> _refreshPage() async {
+    setState(() {
+      searchController.clear(); // Réinitialiser la recherche
+      filteredBookings = []; // Vider la liste filtrée
+      _loadCars(); // Recharger les données
+    });
   }
 
   @override
@@ -168,9 +195,8 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back), // زر الرجوع
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            // الانتقال إلى الشاشة السابقة
             Navigator.push(
               context,
               MaterialPageRoute(
@@ -180,47 +206,51 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
           },
         ),
       ),
-      body: Column(
-        children: [
-          // شريط البحث
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: searchController,
-              decoration: InputDecoration(
-                hintText: 'ابحث عن سيارات...',
-                prefixIcon: const Icon(Icons.search, color: Colors.blueGrey),
-                filled: true,
-                fillColor: Colors.grey[200],
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  borderSide: BorderSide.none,
+      body: RefreshIndicator(
+        onRefresh: _refreshPage, // Appeler la méthode d'actualisation
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(), // Nécessaire pour le pull-to-refresh
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  controller: searchController,
+                  decoration: InputDecoration(
+                    hintText: 'ابحث عن سيارات...',
+                    prefixIcon: const Icon(Icons.search, color: Colors.blueGrey),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                  onChanged: filterBookings,
                 ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
               ),
-              onChanged: filterBookings,
-            ),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.8, // Hauteur fixe pour éviter débordement
+                child: FutureBuilder<List<CarModel>>(
+                  future: futureCars,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('خطأ: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return emptyBooking();
+                    } else {
+                      return filledBooking(filteredBookings);
+                    }
+                  },
+                ),
+              ),
+            ],
           ),
-          // قائمة الحجوزات
-          Expanded(
-            child: FutureBuilder<List<CarModel>>(
-              future: futureCars,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('خطأ: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return emptyBooking();
-                } else {
-                  return filledBooking(filteredBookings);
-                }
-              },
-            ),
-          ),
-        ],
+        ),
       ),
-      // زر الإضافة العائم
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(
@@ -261,6 +291,7 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
       itemCount: bookingList.length,
       itemBuilder: (context, index) {
         final car = bookingList[index];
+        final imageUrl = createCarImage(car, "03", car.carColor);
         final borderColor = car.availability == 1 ? Colors.green : Colors.red;
         return Card(
           elevation: 4,
@@ -286,12 +317,25 @@ class _MyBookingScreenState extends State<MyBookingScreen> {
                   Row(
                     children: [
                       ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(
-                          "assets/bmw_x5.png",
-                          fit: BoxFit.cover,
-                          width: 100,
-                          height: 70,
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(12)),
+                        child: FutureBuilder(
+                          future: precacheImage(NetworkImage(imageUrl), context),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState == ConnectionState.done) {
+                              return Image.network(
+                                imageUrl,
+                                fit: BoxFit.cover,
+                                width: 70,
+                                height: 70,
+                              );
+                            } else {
+                              return Container(
+                                height: 90,
+                                color: Colors.grey[300],
+                                child: Center(child: CircularProgressIndicator()),
+                              );
+                            }
+                          },
                         ),
                       ),
                       const SizedBox(width: 16),
