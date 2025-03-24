@@ -80,7 +80,6 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         _firstNameController.text.isNotEmpty &&
         _fatherNameController.text.isNotEmpty &&
         _lastNameController.text.isNotEmpty &&
-        _emailController.text.isNotEmpty &&
         _phoneController.text.isNotEmpty &&
         _whatsappController.text.isNotEmpty &&
         _streetController.text.isNotEmpty &&
@@ -247,7 +246,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     //   ));
     // }
 
-   // print("files :$request.files.id_picture");
+    // print("files :$request.files.id_picture");
     print("files :$request.files.driver_license");
     print("fields : $request.fields");
 
@@ -360,32 +359,32 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                   ),
                 ),
                 SizedBox(height: 20),
-              Row(
-                children: [
-                  Text('With Driver', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  if (withDriver) // Afficher "+10 JOD" uniquement si le switch est activé
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Text(
-                        '+10 JOD',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.green, // Vous pouvez personnaliser la couleur
+                Row(
+                  children: [
+                    Text('With Driver', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    if (withDriver) // Afficher "+10 JOD" uniquement si le switch est activé
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0),
+                        child: Text(
+                          '+10 JOD',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green, // Vous pouvez personnaliser la couleur
+                          ),
                         ),
                       ),
+                    CupertinoSwitch(
+                      value: withDriver,
+                      activeColor: primaryColor,
+                      onChanged: (value) {
+                        setState(() {
+                          withDriver = value;
+                        });
+                      },
                     ),
-                  CupertinoSwitch(
-                    value: withDriver,
-                    activeColor: primaryColor,
-                    onChanged: (value) {
-                      setState(() {
-                        withDriver = value;
-                      });
-                    },
-                  ),
-                ],
-              ),
+                  ],
+                ),
                 SizedBox(height: 20),
                 FutureBuilder<List<Map<String, dynamic>>>(
                   future: fetchCountries(),
